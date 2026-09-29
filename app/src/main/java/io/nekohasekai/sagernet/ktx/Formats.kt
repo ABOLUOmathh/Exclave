@@ -31,6 +31,7 @@ import io.nekohasekai.sagernet.fmt.naive.parseNaive
 import io.nekohasekai.sagernet.fmt.parseBackup
 import io.nekohasekai.sagernet.fmt.shadowquic.parseShadowQUIC
 import io.nekohasekai.sagernet.fmt.shadowsocks.parseShadowsocks
+import io.nekohasekai.sagernet.fmt.onesocks.parseOneSocks
 import io.nekohasekai.sagernet.fmt.shadowsocksr.parseShadowsocksR
 import io.nekohasekai.sagernet.fmt.socks.parseSOCKS
 import io.nekohasekai.sagernet.fmt.trusttunnel.parseTrustTunnel
@@ -78,6 +79,10 @@ fun parseShareLinks(text: String): List<AbstractBean> {
             || startsWith("trojan://", ignoreCase = true)) {
             runCatching {
                 entities.add(parseV2Ray(this))
+            }
+        } else if (startsWith("onesocks://", ignoreCase = true)) {
+            runCatching {
+                entities.add(parseOneSocks(this))
             }
         } else if (startsWith("ss://", ignoreCase = true)) {
             runCatching {
