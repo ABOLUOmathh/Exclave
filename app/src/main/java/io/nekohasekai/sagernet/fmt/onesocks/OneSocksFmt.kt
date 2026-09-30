@@ -4,27 +4,30 @@ import libexclavecore.Libexclavecore
 import io.nekohasekai.sagernet.ktx.queryParameter
 
 
-fun parseOneSocks(url: String): OneSocksBean {
+fun parseOneSocks(url:String):OneSocksBean{
 
-    val link = Libexclavecore.parseURL(url)
+    val link=Libexclavecore.parseURL(url)
+
+
+    android.util.Log.e(
+        "OneSocks",
+        "url=$url host=${link.getHost()} port=${link.getPort()} user=${link.getUsername()}"
+    )
+
 
     return OneSocksBean().apply {
 
+
         serverAddress = link.host
 
-        serverPort = when {
-            !link.hasPort() -> error("invalid port")
-            else -> link.port
-        }
+        serverPort = link.port
 
 
-        method =
-            link.username
-                ?: "aes-128-ctr"
+        method = "aes-128-ctr"
 
 
         password =
-            link.password
+            link.username
                 ?: ""
 
 
@@ -32,49 +35,89 @@ fun parseOneSocks(url: String): OneSocksBean {
             link.queryParameter("padding")
                 ?: ""
 
+        udp =
+            link.queryParameter("udp") == "1"
+
+
+        uot =
+            link.queryParameter("uot") == "1"
+
+
+        version =
+            link.queryParameter("v")
+                ?.toIntOrNull()
+                ?: 1
+
 
         name =
             link.fragment
 
+        android.util.Log.e(
+            "OneSocks",
+            "Bean address=$serverAddress port=$serverPort password=$password"
+        )
+
+
     }
+
 }
 
 
 
 fun OneSocksBean.toUri(): String {
 
-    val builder =
-        Libexclavecore.newURL("onesocks")
+    val query = ArrayList<String>()
 
-
-    builder.setHostPort(
-        serverAddress,
-        serverPort
+    query.add(
+        "v=${version}"
     )
 
-
-    builder.username = method
-
-
-    if (password.isNotEmpty()) {
-        builder.password = password
+    if (udp) {
+        query.add("udp=1")
     }
 
+    if (uot) {
+        query.add("uot=1")
+    }
 
     if (paddingLen.isNotEmpty()) {
-
-        builder.addQueryParameter(
-            "padding",
-            paddingLen
+        query.add(
+            "padding=${paddingLen}"
         )
-
     }
 
+    query.add("e=1")
 
-    if (name.isNotEmpty()) {
-        builder.fragment = name
+
+    return buildString {
+
+        append("os://")
+
+        append(password)
+
+        append("@")
+
+        append(serverAddress)
+
+        append(":")
+
+        append(serverPort)
+
+        append("?")
+
+        append(query.joinToString("&"))
+
+        if(name.isNotEmpty()){
+
+            append("#")
+
+            append(
+                java.net.URLEncoder.encode(
+                    name,
+                    "UTF-8"
+                )
+            )
+
+        }
     }
-
-
-    return builder.string
 }

@@ -7,13 +7,24 @@ import com.esotericsoftware.kryo.io.ByteBufferOutput;
 
 import org.jetbrains.annotations.NotNull;
 
+import io.nekohasekai.sagernet.fmt.AbstractBean;
 import io.nekohasekai.sagernet.fmt.KryoConverters;
-import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean;
 
 
-public class OneSocksBean extends ShadowsocksBean {
+public class OneSocksBean extends AbstractBean {
+
+    public String password;
+
+    public String method;
 
     public String paddingLen;
+
+    public boolean udp;
+
+    public boolean uot;
+
+    public int version = 1;
+
 
 
     @Override
@@ -21,48 +32,80 @@ public class OneSocksBean extends ShadowsocksBean {
 
         super.initializeDefaultValues();
 
-        if (method == null)
+
+        if(method == null)
             method = "aes-128-ctr";
 
-        if (paddingLen == null)
-            paddingLen = "";
+
+        if(password == null)
+            password="";
+
+
+        if(paddingLen == null)
+            paddingLen="";
 
     }
 
 
+
     @Override
-    public void serialize(ByteBufferOutput output) {
+    public void serialize(ByteBufferOutput output){
 
         output.writeInt(1);
 
         super.serialize(output);
 
+
+        output.writeString(serverAddress);
+        output.writeInt(serverPort);
+
+
+        output.writeString(method);
+        output.writeString(password);
         output.writeString(paddingLen);
+
+        output.writeBoolean(udp);
+        output.writeBoolean(uot);
 
     }
 
 
-    @Override
-    public void deserialize(ByteBufferInput input) {
 
-        int version = input.readInt();
+    @Override
+    public void deserialize(ByteBufferInput input){
+
+        int version=input.readInt();
 
         super.deserialize(input);
 
-        paddingLen = input.readString();
+
+        serverAddress=input.readString();
+
+        serverPort=input.readInt();
+
+
+        method=input.readString();
+
+        password=input.readString();
+
+        paddingLen=input.readString();
+
+        udp=input.readBoolean();
+
+        uot=input.readBoolean();
 
     }
 
 
-    @Override
-    public String protocolName() {
+
+    public String protocolName(){
         return "OneSocks";
     }
 
 
+
     @NotNull
-    @Override
-    public OneSocksBean clone() {
+    public OneSocksBean clone(){
 
         return KryoConverters.deserialize(
                 new OneSocksBean(),
@@ -72,20 +115,5 @@ public class OneSocksBean extends ShadowsocksBean {
     }
 
 
-    public static final Creator<OneSocksBean> CREATOR =
-            new Creator<>() {
-
-        @NonNull
-        @Override
-        public OneSocksBean newInstance() {
-            return new OneSocksBean();
-        }
-
-
-        @Override
-        public OneSocksBean[] newArray(int size) {
-            return new OneSocksBean[size];
-        }
-    };
 
 }
