@@ -20,6 +20,8 @@
 package io.nekohasekai.sagernet.group
 
 import io.nekohasekai.sagernet.fmt.AbstractBean
+import io.nekohasekai.sagernet.fmt.heysocksxhttp.HeySocksXHTTPBean
+import io.nekohasekai.sagernet.fmt.onesocks.OneSocksBean
 
 object Protocols {
 
@@ -28,7 +30,26 @@ object Protocols {
     ) {
 
         fun hash(): String {
-            return bean.serverAddress + bean.serverPort + type
+            val fields: List<Any?> = when (bean) {
+                is HeySocksXHTTPBean -> listOf(
+                    type, bean.serverAddress, bean.serverPort,
+                    bean.method, bean.password,
+                    bean.fakeTCP, bean.fakeUDP,
+                    bean.udp, bean.uot, bean.uotVersion,
+                    bean.paddingLen, bean.e, bean.linkVersion
+                )
+                is OneSocksBean -> listOf(
+                    type, bean.serverAddress, bean.serverPort,
+                    bean.method, bean.password, bean.paddingLen,
+                    bean.udp, bean.uot, bean.version
+                )
+                else -> return bean.serverAddress + bean.serverPort + type
+            }
+
+            return fields.joinToString(separator = "", prefix = "config:") { value ->
+                val text = value?.toString()
+                if (text == null) "-1:" else "${text.length}:$text"
+            }
         }
 
         override fun hashCode(): Int {
