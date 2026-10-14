@@ -66,7 +66,7 @@ public class HeySocksXHTTPBean extends AbstractBean {
         linkVersion = input.readInt();
     }
 
-    public String protocolName() { return "HeySocks XHTTP"; }
+    public String protocolName() { return "黑丝 XHTTP"; }
 
     @NonNull
     @Override

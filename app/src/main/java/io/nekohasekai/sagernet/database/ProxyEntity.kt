@@ -217,6 +217,7 @@ data class ProxyEntity(
             TYPE_SOCKS -> socksBean = KryoConverters.socksDeserialize(byteArray)
             TYPE_HTTP -> httpBean = KryoConverters.httpDeserialize(byteArray)
             TYPE_SS -> ssBean = KryoConverters.shadowsocksDeserialize(byteArray)
+            TYPE_ONESOCKS -> onesocksBean = KryoConverters.onesocksDeserialize(byteArray)
             TYPE_HEYSOCKS_XHTTP -> heysocksXhttpBean = KryoConverters.heysocksXhttpDeserialize(byteArray)
             TYPE_SSR -> ssrBean = KryoConverters.shadowsocksRDeserialize(byteArray)
             TYPE_VMESS -> vmessBean = KryoConverters.vmessDeserialize(byteArray)

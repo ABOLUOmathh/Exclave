@@ -9,10 +9,6 @@ fun parseOneSocks(url:String):OneSocksBean{
     val link=Libexclavecore.parseURL(url)
 
 
-    android.util.Log.e(
-        "OneSocks",
-        "url=$url host=${link.getHost()} port=${link.getPort()} user=${link.getUsername()}"
-    )
 
 
     return OneSocksBean().apply {
@@ -52,10 +48,6 @@ fun parseOneSocks(url:String):OneSocksBean{
         name =
             link.fragment
 
-        android.util.Log.e(
-            "OneSocks",
-            "Bean address=$serverAddress port=$serverPort password=$password"
-        )
 
 
     }

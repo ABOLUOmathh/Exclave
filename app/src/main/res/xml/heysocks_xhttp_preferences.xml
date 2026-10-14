@@ -1,49 +1,61 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
     <EditTextPreference
+        app:icon="@drawable/ic_social_emoji_symbols"
         app:key="profileName"
         app:title="@string/profile_name"
         app:useSimpleSummaryProvider="true" />
 
     <PreferenceCategory app:title="@string/proxy_cat">
         <EditTextPreference
+            app:icon="@drawable/ic_hardware_router"
             app:key="serverAddress"
             app:title="@string/server_address"
             app:useSimpleSummaryProvider="true" />
         <EditTextPreference
+            app:icon="@drawable/ic_maps_directions_boat"
             app:key="serverPort"
             app:title="@string/server_port"
             app:useSimpleSummaryProvider="true" />
         <EditTextPreference
+            app:icon="@drawable/ic_settings_password"
             app:key="serverPassword"
             app:title="@string/password" />
         <EditTextPreference
+            app:icon="@drawable/ic_notification_enhanced_encryption"
             app:key="serverMethod"
             app:title="@string/enc_method"
             app:useSimpleSummaryProvider="true" />
         <EditTextPreference
+            app:icon="@drawable/ic_hardware_router"
             app:key="xhttpFakeTCP"
             app:title="Fake TCP (hex)"
             app:useSimpleSummaryProvider="true" />
         <EditTextPreference
+            app:icon="@drawable/ic_hardware_router"
             app:key="xhttpFakeUDP"
             app:title="Fake UDP (hex)"
             app:useSimpleSummaryProvider="true" />
         <SwitchPreference
+            app:icon="@drawable/ic_hardware_router"
             app:key="xhttpUdp"
             app:title="Native UDP" />
         <SwitchPreference
+            app:icon="@drawable/ic_notification_enhanced_encryption"
             app:key="xhttpUot"
             app:title="UDP over TCP (UOT)" />
         <EditTextPreference
+            app:icon="@drawable/ic_notification_enhanced_encryption"
             app:key="xhttpUotVersion"
             app:title="UOT version (0, 1, 2)"
             app:summary="0/2 = UOT V2; 1 = legacy UOT V1"
             app:useSimpleSummaryProvider="false" />
         <EditTextPreference
+            app:icon="@drawable/ic_baseline_format_align_left_24"
             app:key="paddingLen"
             app:title="Padding (compatibility only)"
             app:summary="Stored but not applied by current xstream" />
         <SwitchPreference
+            app:icon="@drawable/ic_notification_enhanced_encryption"
             app:key="xhttpE"
             app:title="E (compatibility only)"
             app:summary="Stored but not applied by current xstream" />

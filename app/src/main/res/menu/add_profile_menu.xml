@@ -77,6 +77,10 @@
                                 android:id="@+id/action_new_http3"
                                 android:title="@string/action_http3" />
                             <item
+                                android:id="@+id/action_new_onesocks"
+                                android:title="OneSocks"
+                                tools:ignore="HardcodedText" />
+                            <item
                                 android:id="@+id/action_new_heysocks_xhttp"
                                 android:title="HeySocks XHTTP"
                                 tools:ignore="HardcodedText" />
