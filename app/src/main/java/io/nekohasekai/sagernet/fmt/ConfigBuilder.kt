@@ -51,6 +51,7 @@ import io.nekohasekai.sagernet.fmt.mieru.MieruBean
 import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
 import io.nekohasekai.sagernet.fmt.onesocks.OneSocksBean
+import io.nekohasekai.sagernet.fmt.heysocksxhttp.HeySocksXHTTPBean
 import io.nekohasekai.sagernet.fmt.shadowsocksr.ShadowsocksRBean
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.ssh.SSHBean
@@ -92,6 +93,7 @@ import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.RoutingObject.BalancerObjec
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.SSHOutboundConfigurationObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.ShadowsocksOutboundConfigurationObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.OneSocksOutboundConfigurationObject
+import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.HeySocksXHTTPOutboundConfigurationObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.SocksInboundConfigurationObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.SocksOutboundConfigurationObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.SplitHTTPObject
@@ -1235,6 +1237,29 @@ fun buildV2RayConfig(
                                         }
                                     }
                                 }
+                            } else if (bean is HeySocksXHTTPBean) {
+                                require(bean.uotVersion in 0..2) { "Unsupported HeySocks XHTTP UOT version" }
+                                protocol = "heysocks-xhttp"
+                                settings = LazyOutboundConfigurationObject(this,
+                                    HeySocksXHTTPOutboundConfigurationObject().apply {
+                                        udp = bean.udp
+                                        uot = bean.uot
+                                        uotVersion = bean.uotVersion
+                                        paddingLen = bean.paddingLen
+                                        e = bean.e
+                                        h = ""
+                                        servers = listOf(
+                                            HeySocksXHTTPOutboundConfigurationObject.ServerObject().apply {
+                                                address = bean.serverAddress
+                                                port = bean.serverPort
+                                                cipher = bean.method
+                                                password = bean.password
+                                                fakeTcp = bean.fakeTCP
+                                                fakeUdp = bean.fakeUDP
+                                            }
+                                        )
+                                    }
+                                )
                             } else if (bean is OneSocksBean) {
                                 protocol = "onesocks"
 

@@ -472,6 +472,9 @@ class ConfigurationFragment @JvmOverloads constructor(
             R.id.action_new_http -> {
                 startActivity(Intent(requireActivity(), HttpSettingsActivity::class.java))
             }
+            R.id.action_new_heysocks_xhttp -> {
+                startActivity(Intent(requireActivity(), HeySocksXHTTPSettingsActivity::class.java))
+            }
             R.id.action_new_ss -> {
                 startActivity(Intent(requireActivity(), ShadowsocksSettingsActivity::class.java))
             }

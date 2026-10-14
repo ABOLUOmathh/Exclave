@@ -42,6 +42,7 @@ import io.nekohasekai.sagernet.fmt.naive.NaiveBean;
 import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean;
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean;
 import io.nekohasekai.sagernet.fmt.onesocks.OneSocksBean;
+import io.nekohasekai.sagernet.fmt.heysocksxhttp.HeySocksXHTTPBean;
 import io.nekohasekai.sagernet.fmt.shadowsocksr.ShadowsocksRBean;
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean;
 import io.nekohasekai.sagernet.fmt.ssh.SSHBean;
@@ -123,6 +124,12 @@ public class KryoConverters {
     public static OneSocksBean onesocksDeserialize(byte[] bytes) {
         if (bytes == null || bytes.length == 0) return null;
         return deserialize(new OneSocksBean(), bytes);
+    }
+
+    @TypeConverter
+    public static HeySocksXHTTPBean heysocksXhttpDeserialize(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) return null;
+        return deserialize(new HeySocksXHTTPBean(), bytes);
     }
 
     @TypeConverter

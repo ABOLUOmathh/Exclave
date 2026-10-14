@@ -1,0 +1,51 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <EditTextPreference
+        app:key="profileName"
+        app:title="@string/profile_name"
+        app:useSimpleSummaryProvider="true" />
+
+    <PreferenceCategory app:title="@string/proxy_cat">
+        <EditTextPreference
+            app:key="serverAddress"
+            app:title="@string/server_address"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:key="serverPort"
+            app:title="@string/server_port"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:key="serverPassword"
+            app:title="@string/password" />
+        <EditTextPreference
+            app:key="serverMethod"
+            app:title="@string/enc_method"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:key="xhttpFakeTCP"
+            app:title="Fake TCP (hex)"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:key="xhttpFakeUDP"
+            app:title="Fake UDP (hex)"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreference
+            app:key="xhttpUdp"
+            app:title="Native UDP" />
+        <SwitchPreference
+            app:key="xhttpUot"
+            app:title="UDP over TCP (UOT)" />
+        <EditTextPreference
+            app:key="xhttpUotVersion"
+            app:title="UOT version (0, 1, 2)"
+            app:summary="0/2 = UOT V2; 1 = legacy UOT V1"
+            app:useSimpleSummaryProvider="false" />
+        <EditTextPreference
+            app:key="paddingLen"
+            app:title="Padding (compatibility only)"
+            app:summary="Stored but not applied by current xstream" />
+        <SwitchPreference
+            app:key="xhttpE"
+            app:title="E (compatibility only)"
+            app:summary="Stored but not applied by current xstream" />
+    </PreferenceCategory>
+</PreferenceScreen>

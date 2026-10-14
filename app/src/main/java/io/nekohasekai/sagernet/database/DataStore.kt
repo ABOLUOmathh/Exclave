@@ -302,6 +302,12 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var paddingLen by profileCacheStore.string(Key.SERVER_PADDING_LEN)
     var serverOneSocksUdp by profileCacheStore.boolean(Key.SERVER_ONESOCKS_UDP)
     var serverOneSocksUot by profileCacheStore.boolean(Key.SERVER_ONESOCKS_UOT)
+    var xhttpFakeTCP by profileCacheStore.string(Key.XHTTP_FAKE_TCP)
+    var xhttpFakeUDP by profileCacheStore.string(Key.XHTTP_FAKE_UDP)
+    var xhttpUdp by profileCacheStore.boolean(Key.XHTTP_UDP)
+    var xhttpUot by profileCacheStore.boolean(Key.XHTTP_UOT)
+    var xhttpUotVersion by profileCacheStore.stringToInt(Key.XHTTP_UOT_VERSION)
+    var xhttpE by profileCacheStore.boolean(Key.XHTTP_E)
     var serverPlugin by profileCacheStore.string(Key.SERVER_PLUGIN)
 
     var serverProtocol by profileCacheStore.string(Key.SERVER_PROTOCOL)

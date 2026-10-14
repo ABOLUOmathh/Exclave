@@ -149,6 +149,12 @@ object Key {
 
     const val SERVER_ONESOCKS_UDP = "serverOneSocksUdp"
     const val SERVER_ONESOCKS_UOT = "serverOneSocksUot"
+    const val XHTTP_FAKE_TCP = "xhttpFakeTCP"
+    const val XHTTP_FAKE_UDP = "xhttpFakeUDP"
+    const val XHTTP_UDP = "xhttpUdp"
+    const val XHTTP_UOT = "xhttpUot"
+    const val XHTTP_UOT_VERSION = "xhttpUotVersion"
+    const val XHTTP_E = "xhttpE"
 
     const val SERVER_PROTOCOL = "serverProtocol"
     const val SERVER_PROTOCOL_PARAM = "serverProtocolParam"

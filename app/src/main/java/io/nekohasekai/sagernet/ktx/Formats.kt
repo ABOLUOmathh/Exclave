@@ -32,6 +32,7 @@ import io.nekohasekai.sagernet.fmt.parseBackup
 import io.nekohasekai.sagernet.fmt.shadowquic.parseShadowQUIC
 import io.nekohasekai.sagernet.fmt.shadowsocks.parseShadowsocks
 import io.nekohasekai.sagernet.fmt.onesocks.parseOneSocks
+import io.nekohasekai.sagernet.fmt.heysocksxhttp.parseHeySocksXHTTP
 import io.nekohasekai.sagernet.fmt.shadowsocksr.parseShadowsocksR
 import io.nekohasekai.sagernet.fmt.socks.parseSOCKS
 import io.nekohasekai.sagernet.fmt.trusttunnel.parseTrustTunnel
@@ -80,6 +81,8 @@ fun parseShareLinks(text: String): List<AbstractBean> {
             runCatching {
                 entities.add(parseV2Ray(this))
             }
+        } else if (startsWith("xhttp://", ignoreCase = true)) {
+            runCatching { entities.add(parseHeySocksXHTTP(this)) }
         } else if (startsWith("onesocks://", ignoreCase = true)
             || startsWith("os://", ignoreCase = true)) {
             runCatching {

@@ -674,6 +674,8 @@ public class V2RayConfig {
                     return ShadowsocksOutboundConfigurationObject.class;
                 case "onesocks":
                     return OneSocksOutboundConfigurationObject.class;
+                case "heysocks-xhttp":
+                    return HeySocksXHTTPOutboundConfigurationObject.class;
                 case "trojan":
                     return TrojanOutboundConfigurationObject.class;
                 case "loopback":
@@ -865,6 +867,25 @@ public class V2RayConfig {
 
         }
 
+    }
+
+    public static class HeySocksXHTTPOutboundConfigurationObject implements OutboundConfigurationObject {
+        public List<ServerObject> servers;
+        public Boolean udp;
+        public Boolean uot;
+        public Integer uotVersion;
+        public String paddingLen;
+        public Boolean e;
+        public String h;
+
+        public static class ServerObject {
+            public String address;
+            public Integer port;
+            public String cipher;
+            public String password;
+            public String fakeTcp;
+            public String fakeUdp;
+        }
     }
 
     public static class Shadowsocks2022OutboundConfigurationObject implements OutboundConfigurationObject {

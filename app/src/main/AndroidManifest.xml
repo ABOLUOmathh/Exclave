@@ -171,6 +171,9 @@
             android:name=".ui.profile.OneSocksSettingsActivity"
             android:exported="false"/>
         <activity
+            android:name=".ui.profile.HeySocksXHTTPSettingsActivity"
+            android:exported="false"/>
+        <activity
             android:name="io.nekohasekai.sagernet.ui.profile.ShadowsocksRSettingsActivity" />
         <activity
             android:name="io.nekohasekai.sagernet.ui.profile.VMessSettingsActivity" />
