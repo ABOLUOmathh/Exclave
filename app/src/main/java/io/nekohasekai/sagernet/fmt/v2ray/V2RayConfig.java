@@ -672,6 +672,8 @@ public class V2RayConfig {
                     return VLESSOutboundConfigurationObject.class;
                 case "shadowsocks":
                     return ShadowsocksOutboundConfigurationObject.class;
+                case "onesocks":
+                    return OneSocksOutboundConfigurationObject.class;
                 case "trojan":
                     return TrojanOutboundConfigurationObject.class;
                 case "loopback":
@@ -838,6 +840,30 @@ public class V2RayConfig {
         public List<String> pluginArgs;
         public String pluginWorkingDir;
         public Boolean uot;
+
+    }
+
+    public static class OneSocksOutboundConfigurationObject implements OutboundConfigurationObject {
+
+        public List<ServerObject> servers;
+
+        public String paddingLen;
+        public Boolean udp;
+        public Boolean uot;
+        public Integer uotVersion;
+
+
+        public static class ServerObject {
+
+            public String address;
+
+            public Integer port;
+
+            public String password;
+
+            public String cipher;
+
+        }
 
     }
 

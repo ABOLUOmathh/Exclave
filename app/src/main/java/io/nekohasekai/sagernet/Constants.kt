@@ -145,6 +145,10 @@ object Key {
     const val SERVER_PLUGIN = "serverPlugin"
     const val SERVER_PLUGIN_CONFIGURE = "serverPluginConfigure"
     const val SERVER_PASSWORD1 = "serverPassword1"
+    const val SERVER_PADDING_LEN = "paddingLen"
+
+    const val SERVER_ONESOCKS_UDP = "serverOneSocksUdp"
+    const val SERVER_ONESOCKS_UOT = "serverOneSocksUot"
 
     const val SERVER_PROTOCOL = "serverProtocol"
     const val SERVER_PROTOCOL_PARAM = "serverProtocolParam"

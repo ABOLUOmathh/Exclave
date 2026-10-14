@@ -41,6 +41,7 @@ import io.nekohasekai.sagernet.fmt.mieru.MieruBean;
 import io.nekohasekai.sagernet.fmt.naive.NaiveBean;
 import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean;
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean;
+import io.nekohasekai.sagernet.fmt.onesocks.OneSocksBean;
 import io.nekohasekai.sagernet.fmt.shadowsocksr.ShadowsocksRBean;
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean;
 import io.nekohasekai.sagernet.fmt.ssh.SSHBean;
@@ -57,6 +58,23 @@ import io.nekohasekai.sagernet.ktx.Logs;
 public class KryoConverters {
 
     private static final byte[] NULL = new byte[0];
+
+    private static boolean isOneSocks(byte[] bytes) {
+
+        if (bytes.length < 4) {
+            return false;
+        }
+
+
+        int magic =
+                ((bytes[0] & 0xff) << 24) |
+                ((bytes[1] & 0xff) << 16) |
+                ((bytes[2] & 0xff) << 8) |
+                (bytes[3] & 0xff);
+
+
+        return magic == 0x4F534B53;
+    }
 
     @TypeConverter
     public static byte[] serialize(Serializable bean) {
@@ -98,6 +116,13 @@ public class KryoConverters {
     public static ShadowsocksBean shadowsocksDeserialize(byte[] bytes) {
         if (bytes == null || bytes.length == 0) return null;
         return deserialize(new ShadowsocksBean(), bytes);
+    }
+
+
+    @TypeConverter
+    public static OneSocksBean onesocksDeserialize(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) return null;
+        return deserialize(new OneSocksBean(), bytes);
     }
 
     @TypeConverter

@@ -50,6 +50,7 @@ import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.mieru.MieruBean
 import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
+import io.nekohasekai.sagernet.fmt.onesocks.OneSocksBean
 import io.nekohasekai.sagernet.fmt.shadowsocksr.ShadowsocksRBean
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.ssh.SSHBean
@@ -90,6 +91,7 @@ import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.RoutingObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.RoutingObject.BalancerObject.StrategyObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.SSHOutboundConfigurationObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.ShadowsocksOutboundConfigurationObject
+import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.OneSocksOutboundConfigurationObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.SocksInboundConfigurationObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.SocksOutboundConfigurationObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.SplitHTTPObject
@@ -732,6 +734,7 @@ fun buildV2RayConfig(
                                                     password = bean.password
                                                 })
                                         })
+
                                 } else if (bean is ShadowsocksBean) {
                                     protocol = "shadowsocks"
                                     settings = LazyOutboundConfigurationObject(this,
@@ -1232,6 +1235,27 @@ fun buildV2RayConfig(
                                         }
                                     }
                                 }
+                            } else if (bean is OneSocksBean) {
+                                protocol = "onesocks"
+
+                                settings = LazyOutboundConfigurationObject(this,
+                                    OneSocksOutboundConfigurationObject().apply {
+
+                                        paddingLen = bean.paddingLen
+                                        udp = bean.udp
+                                        uot = bean.uot
+                                        uotVersion = 2
+
+                                        servers = listOf(
+                                            OneSocksOutboundConfigurationObject.ServerObject().apply {
+                                                address = bean.serverAddress
+                                                port = bean.serverPort
+                                                password = bean.password
+                                                cipher = bean.method
+                                            }
+                                        )
+                                    }
+                                )
                             } else if (bean is ShadowsocksRBean) {
                                 protocol = "shadowsocks"
                                 settings = LazyOutboundConfigurationObject(this,

@@ -299,6 +299,9 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var serverPassword by profileCacheStore.string(Key.SERVER_PASSWORD)
     var serverPassword1 by profileCacheStore.string(Key.SERVER_PASSWORD1)
     var serverMethod by profileCacheStore.string(Key.SERVER_METHOD)
+    var paddingLen by profileCacheStore.string(Key.SERVER_PADDING_LEN)
+    var serverOneSocksUdp by profileCacheStore.boolean(Key.SERVER_ONESOCKS_UDP)
+    var serverOneSocksUot by profileCacheStore.boolean(Key.SERVER_ONESOCKS_UOT)
     var serverPlugin by profileCacheStore.string(Key.SERVER_PLUGIN)
 
     var serverProtocol by profileCacheStore.string(Key.SERVER_PROTOCOL)

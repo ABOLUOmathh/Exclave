@@ -48,6 +48,8 @@ import io.nekohasekai.sagernet.fmt.mieru.toUri
 import io.nekohasekai.sagernet.fmt.naive.NaiveBean
 import io.nekohasekai.sagernet.fmt.naive.buildNaiveConfig
 import io.nekohasekai.sagernet.fmt.naive.toUri
+import io.nekohasekai.sagernet.fmt.onesocks.toUri
+import io.nekohasekai.sagernet.ui.profile.OneSocksSettingsActivity
 import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean
 import io.nekohasekai.sagernet.fmt.shadowquic.toUri
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
@@ -68,6 +70,7 @@ import io.nekohasekai.sagernet.fmt.tuic5.toUri
 import io.nekohasekai.sagernet.fmt.v2ray.VLESSBean
 import io.nekohasekai.sagernet.fmt.v2ray.VMessBean
 import io.nekohasekai.sagernet.fmt.v2ray.toUri
+import io.nekohasekai.sagernet.fmt.onesocks.OneSocksBean
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
@@ -90,6 +93,7 @@ data class ProxyEntity(
     var socksBean: SOCKSBean? = null,
     var httpBean: HttpBean? = null,
     var ssBean: ShadowsocksBean? = null,
+    var onesocksBean: OneSocksBean? = null,
     var ssrBean: ShadowsocksRBean? = null,
     var vmessBean: VMessBean? = null,
     var vlessBean: VLESSBean? = null,
@@ -115,6 +119,7 @@ data class ProxyEntity(
         const val TYPE_SOCKS = 0
         const val TYPE_HTTP = 1
         const val TYPE_SS = 2
+        const val TYPE_ONESOCKS = 31
         const val TYPE_SSR = 3
         const val TYPE_VMESS = 4
         const val TYPE_VLESS = 5
@@ -235,6 +240,7 @@ data class ProxyEntity(
         TYPE_SOCKS -> socksBean!!.protocolName()
         TYPE_HTTP -> httpBean!!.protocolName()
         TYPE_SS -> ssBean!!.protocolName()
+        TYPE_ONESOCKS -> onesocksBean!!.protocolName()
         TYPE_SSR -> "ShadowsocksR"
         TYPE_VMESS -> "VMess"
         TYPE_VLESS -> "VLESS"
@@ -266,6 +272,7 @@ data class ProxyEntity(
             TYPE_SOCKS -> socksBean
             TYPE_HTTP -> httpBean
             TYPE_SS -> ssBean
+            TYPE_ONESOCKS -> onesocksBean
             TYPE_SSR -> ssrBean
             TYPE_VMESS -> vmessBean
             TYPE_VLESS -> vlessBean
@@ -310,6 +317,7 @@ data class ProxyEntity(
         when (this) {
             is SOCKSBean -> toUri()
             is HttpBean -> toUri()
+            is OneSocksBean -> toUri()
             is ShadowsocksBean -> toUri()
             is ShadowsocksRBean -> toUri()
             is VMessBean -> toUri()
@@ -368,6 +376,7 @@ data class ProxyEntity(
         socksBean = null
         httpBean = null
         ssBean = null
+        onesocksBean = null
         ssrBean = null
         vmessBean = null
         vlessBean = null
@@ -397,6 +406,10 @@ data class ProxyEntity(
             is HttpBean -> {
                 type = TYPE_HTTP
                 httpBean = bean
+            }
+            is OneSocksBean -> {
+                type = TYPE_ONESOCKS
+                onesocksBean = bean
             }
             is ShadowsocksBean -> {
                 type = TYPE_SS
@@ -489,6 +502,7 @@ data class ProxyEntity(
             TYPE_SOCKS -> SocksSettingsActivity::class.java
             TYPE_HTTP -> HttpSettingsActivity::class.java
             TYPE_SS -> ShadowsocksSettingsActivity::class.java
+            TYPE_ONESOCKS -> OneSocksSettingsActivity::class.java
             TYPE_SSR -> ShadowsocksRSettingsActivity::class.java
             TYPE_VMESS -> VMessSettingsActivity::class.java
             TYPE_VLESS -> VLESSSettingsActivity::class.java

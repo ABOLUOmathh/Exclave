@@ -80,7 +80,8 @@ fun parseShareLinks(text: String): List<AbstractBean> {
             runCatching {
                 entities.add(parseV2Ray(this))
             }
-        } else if (startsWith("onesocks://", ignoreCase = true)) {
+        } else if (startsWith("onesocks://", ignoreCase = true)
+            || startsWith("os://", ignoreCase = true)) {
             runCatching {
                 entities.add(parseOneSocks(this))
             }

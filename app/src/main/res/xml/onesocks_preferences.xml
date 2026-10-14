@@ -1,0 +1,56 @@
+
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditTextPreference
+        app:icon="@drawable/ic_social_emoji_symbols"
+        app:key="profileName"
+        app:title="@string/profile_name"
+        app:useSimpleSummaryProvider="true" />
+
+    <PreferenceCategory app:title="@string/proxy_cat">
+
+        <EditTextPreference
+            app:icon="@drawable/ic_hardware_router"
+            app:key="serverAddress"
+            app:title="@string/server_address"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_maps_directions_boat"
+            app:key="serverPort"
+            app:title="@string/server_port"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_settings_password"
+            app:key="serverPassword"
+            app:title="@string/password"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_notification_enhanced_encryption"
+            app:key="serverMethod"
+            app:title="@string/enc_method"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_format_align_left_24"
+            app:key="paddingLen"
+            app:title="Padding"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreference
+            app:icon="@drawable/ic_hardware_router"
+            app:key="serverOneSocksUdp"
+            app:title="UDP"
+            app:summary="启用 UDP 配置" />
+
+        <SwitchPreference
+            app:icon="@drawable/ic_notification_enhanced_encryption"
+            app:key="serverOneSocksUot"
+            app:title="UDP over TCP (UOT)"
+            app:summary="启用 UDP over TCP 配置" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
