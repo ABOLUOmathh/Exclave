@@ -21,8 +21,12 @@ filippo.io/mldsa v0.0.0-20260711112038-ff3f469cee29 h1:11cJmDX5FvZu/znhVjfwxs9jZ
 filippo.io/mldsa v0.0.0-20260711112038-ff3f469cee29/go.mod h1:32qQ5yj3R24Eu03iWFWchdC3OB653wPvoepWejkefbY=
 github.com/ABOLUOmathh/LibExclaveCore v0.0.0-20261014015900-6a743f3fcae6 h1:ugJYi6LKe8wcn4SvmJiocMZpsXgecQ3b9MSjKdqC6Og=
 github.com/ABOLUOmathh/LibExclaveCore v0.0.0-20261014015900-6a743f3fcae6/go.mod h1:17IRj8nwLFhUvhKCVdldTETHJ73jnjCAWE44BsgRndE=
+github.com/ABOLUOmathh/LibExclaveCore v0.0.0-20261014072941-a28703fa1907 h1:eHiEU1vBJzcZ4j0WiCpyJyk/seIo2e13E50I7SYLg8E=
+github.com/ABOLUOmathh/LibExclaveCore v0.0.0-20261014072941-a28703fa1907/go.mod h1:MqhNcFS8yBE42B2bhNHn9GTLooUjKtN+ZYdoPkLyTKM=
 github.com/ABOLUOmathh/exclave-core/v5 v5.50.1-0.20261014013424-e55be694892c h1:9UYSBveiL2O65h4zrDnY9LQzxsXMt0qZUUrJn0JhklQ=
 github.com/ABOLUOmathh/exclave-core/v5 v5.50.1-0.20261014013424-e55be694892c/go.mod h1:lIIphBcVLvtjTbpaSMU2xpEZ2MBsjovpQoXooFBK3gA=
+github.com/ABOLUOmathh/exclave-core/v5 v5.50.1-0.20261014071429-ffe16fbcc116 h1:ryB8I5Md2Fuf0tu2Ucg+l4nPFKO0i1RthKQoB3gG/14=
+github.com/ABOLUOmathh/exclave-core/v5 v5.50.1-0.20261014071429-ffe16fbcc116/go.mod h1:lIIphBcVLvtjTbpaSMU2xpEZ2MBsjovpQoXooFBK3gA=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
