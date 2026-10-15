@@ -43,6 +43,10 @@ val supportedShadowsocks2022Method = arrayOf(
     "2022-blake3-aes-128-gcm","2022-blake3-aes-256-gcm","2022-blake3-chacha20-poly1305",
 )
 
+/** The suffix is a credential marker, NOT the ss:// URL fragment. */
+fun ShadowsocksBean.isBlackstone2022(): Boolean =
+    method == "2022-blake3-aes-128-gcm" && password.endsWith("#BLACKSTONE")
+
 fun ShadowsocksBean.fixInvalidParams() {
     if (!plugin.isNullOrEmpty()) {
         plugin = PluginConfiguration(plugin).apply {
@@ -62,7 +66,7 @@ fun parseShadowsocks(url: String): ShadowsocksBean {
     if (!link.hasPort() && link.userInfo.isEmpty()) {
         // pre-SIP002, https://shadowsocks.org/doc/configs.html#uri-and-qr-code
         // example: ss://YmYtY2ZiOnRlc3QvIUAjOkAxOTIuMTY4LjEwMC4xOjg4ODg#example-server
-        val plainUri = url.substring("ss://".length).substringBefore("#").decodeBase64()
+        val plainUri = url.substring("ss://".length).substringBefore("#").substringBefore("?").decodeBase64()
         return ShadowsocksBean().apply {
             val hostPort = Libexclavecore.splitHostPort(plainUri.substringAfterLast("@"))
             serverAddress = hostPort.host
@@ -78,6 +82,7 @@ fun parseShadowsocks(url: String): ShadowsocksBean {
             if (method in supportedShadowsocks2022Method) {
                 validateShadowsocks2022Password(method, password)
             }
+            if (isBlackstone2022()) singUoT = link.queryParameter("uot") == "1"
             name = link.fragment
         }
     }
@@ -102,6 +107,7 @@ fun parseShadowsocks(url: String): ShadowsocksBean {
             if (method in supportedShadowsocks2022Method) {
                 validateShadowsocks2022Password(method, password)
             }
+            if (isBlackstone2022()) singUoT = link.queryParameter("uot") == "1"
             plugin = link.queryParameter("plugin")
             name = link.fragment
             fixInvalidParams()
@@ -126,6 +132,7 @@ fun parseShadowsocks(url: String): ShadowsocksBean {
         if (method in supportedShadowsocks2022Method) {
             validateShadowsocks2022Password(method, password)
         }
+        if (isBlackstone2022()) singUoT = link.queryParameter("uot") == "1"
         plugin = link.queryParameter("plugin")
         name = link.fragment
         fixInvalidParams()
@@ -134,19 +141,26 @@ fun parseShadowsocks(url: String): ShadowsocksBean {
 
 private fun validateShadowsocks2022Password(method: String, password: String) {
     try {
+        val blackstone = password.endsWith("#BLACKSTONE")
+        // Remove only during validation; keep the marker in the persisted key.
+        val checkPassword = if (blackstone) {
+            require(method == "2022-blake3-aes-128-gcm")
+            password.removeSuffix("#BLACKSTONE")
+        } else password
+        if (blackstone) require(checkPassword.split(":").size >= 2)
         when (method) {
             "2022-blake3-aes-128-gcm" -> {
-                for (p in password.split(":")) {
+                for (p in checkPassword.split(":")) {
                     require(Base64.decode(p).size == 16)
                 }
             }
             "2022-blake3-aes-256-gcm" -> {
-                for (p in password.split(":")) {
+                for (p in checkPassword.split(":")) {
                     require(Base64.decode(p).size == 32)
                 }
             }
             "2022-blake3-chacha20-poly1305" -> {
-                require(Base64.decode(password).size == 32)
+                require(Base64.decode(checkPassword).size == 32)
             }
         }
     } catch (_: Exception) {
@@ -176,6 +190,10 @@ fun ShadowsocksBean.toUri(): String? {
                 PluginConfiguration(plugin).getOptions().toString()
             ).toString(trimId = false)
         )
+    }
+
+    if (isBlackstone2022() && singUoT) {
+        builder.addQueryParameter("uot", "1")
     }
 
     if (name.isNotEmpty()) {

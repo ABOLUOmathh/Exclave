@@ -50,6 +50,7 @@ import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.mieru.MieruBean
 import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
+import io.nekohasekai.sagernet.fmt.shadowsocks.isBlackstone2022
 import io.nekohasekai.sagernet.fmt.onesocks.OneSocksBean
 import io.nekohasekai.sagernet.fmt.heysocksxhttp.HeySocksXHTTPBean
 import io.nekohasekai.sagernet.fmt.shadowsocksr.ShadowsocksRBean
@@ -92,6 +93,7 @@ import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.RoutingObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.RoutingObject.BalancerObject.StrategyObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.SSHOutboundConfigurationObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.ShadowsocksOutboundConfigurationObject
+import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.Shadowsocks2022OutboundConfigurationObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.OneSocksOutboundConfigurationObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.HeySocksXHTTPOutboundConfigurationObject
 import io.nekohasekai.sagernet.fmt.v2ray.V2RayConfig.SocksInboundConfigurationObject
@@ -737,6 +739,22 @@ fun buildV2RayConfig(
                                                 })
                                         })
 
+                                } else if (bean is ShadowsocksBean && bean.isBlackstone2022()) {
+                                    // Only BLACKSTONE opts into the native SS2022 protocol.
+                                    // Ordinary Shadowsocks continues through its original path.
+                                    require(bean.plugin.isEmpty() || PluginConfiguration(bean.plugin).selected.isEmpty()) {
+                                        "BLACKSTONE SS2022 with SIP003 plugin is not supported in Android yet"
+                                    }
+                                    protocol = "shadowsocks-2022"
+                                    settings = LazyOutboundConfigurationObject(this,
+                                        Shadowsocks2022OutboundConfigurationObject().apply {
+                                            address = bean.serverAddress
+                                            port = bean.serverPort
+                                            method = bean.method
+                                            key = bean.password // Preserve the #BLACKSTONE suffix for Core detection.
+                                            uot = bean.singUoT // Legacy v1 selected by Core; no global singuot gate.
+                                        }
+                                    )
                                 } else if (bean is ShadowsocksBean) {
                                     protocol = "shadowsocks"
                                     settings = LazyOutboundConfigurationObject(this,

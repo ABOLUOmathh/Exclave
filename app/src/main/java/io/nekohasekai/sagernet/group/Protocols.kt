@@ -22,6 +22,8 @@ package io.nekohasekai.sagernet.group
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.heysocksxhttp.HeySocksXHTTPBean
 import io.nekohasekai.sagernet.fmt.onesocks.OneSocksBean
+import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
+import io.nekohasekai.sagernet.fmt.shadowsocks.isBlackstone2022
 
 object Protocols {
 
@@ -31,6 +33,12 @@ object Protocols {
 
         fun hash(): String {
             val fields: List<Any?> = when (bean) {
+                is ShadowsocksBean -> {
+                    // Preserve legacy deduplication for every non-BLACKSTONE SS node.
+                    if (!bean.isBlackstone2022()) return bean.serverAddress + bean.serverPort + type
+                    listOf(type, bean.serverAddress, bean.serverPort,
+                        bean.method, bean.password, bean.plugin, bean.singUoT)
+                }
                 is HeySocksXHTTPBean -> listOf(
                     type, bean.serverAddress, bean.serverPort,
                     bean.method, bean.password,
