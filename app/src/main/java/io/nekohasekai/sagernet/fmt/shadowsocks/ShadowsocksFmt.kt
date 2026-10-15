@@ -174,6 +174,30 @@ fun ShadowsocksBean.toUri(): String? {
 
     val builder = Libexclavecore.newURL("ss")
     builder.setHostPort(serverAddress, serverPort)
+    if (isBlackstone2022()) {
+        // Legacy BLACKSTONE share links encode the *entire*
+        // method:password@host:port as one unpadded Base64URL string.
+        // Keep the existing SIP002 parser so both formats remain importable.
+        validateShadowsocks2022Password(method, password)
+        require(plugin.isEmpty() || PluginConfiguration(plugin).selected.isEmpty()) {
+            "BLACKSTONE SS2022 with SIP003 plugin is not supported"
+        }
+        val hostPort = if (serverAddress.contains(":") && !serverAddress.startsWith("[")) {
+            "[$serverAddress]:$serverPort"
+        } else {
+            "$serverAddress:$serverPort"
+        }
+        val wholeLink = "$method:$password@$hostPort"
+        val encoded = Base64.UrlSafe.withPadding(Base64.PaddingOption.ABSENT)
+            .encode(wholeLink.toByteArray(Charsets.UTF_8))
+        val query = if (singUoT) "?uot=1" else ""
+        val fragment = if (name.isNotEmpty()) {
+            // Delegate escaping (including Unicode) to the existing URL builder.
+            builder.fragment = name
+            "#" + builder.string.substringAfter("#")
+        } else ""
+        return "ss://$encoded$query$fragment"
+    }
     if (method in supportedShadowsocks2022Method) {
         validateShadowsocks2022Password(method, password)
         builder.username = method
