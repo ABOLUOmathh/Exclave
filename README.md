@@ -43,7 +43,7 @@ Download the latest signed release APK from [GitHub Releases](https://github.com
 前往 [GitHub Releases](https://github.com/ABOLUOmathh/Exclave/releases) 下载最新签名发布包。
 
 - **Permanent Signing Certificate SHA-256 / 永久签名证书指纹**:
-  `55:EB:74:04:AA:80:E9:3B:3F:43:4F:BE:52:58:8F:C1:78:35:37:FF:54:28:32:D6:5F:BF:9E:23:85:43:CD:6B`
+  `9B:58:48:00:3B:54:1E:95:E7:94:7E:80:52:04:5D:AB:41:18:3D:EB:F5:74:87:05:03:AF:35:05:FE:26:F9:67`
 
 | File Pattern / 文件名称 | Architecture / 适用架构 | Target Devices / 适用设备 |
 | :--- | :--- | :--- |

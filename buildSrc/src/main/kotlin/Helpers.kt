@@ -106,9 +106,9 @@ fun Project.setupAppCommon(projectName: String = "") {
 
     val lp = requireLocalProperties()
     val keystoreFile = rootProject.file("release.keystore")
-    val keystorePwd = lp.getProperty("KEYSTORE_PASS") ?: System.getenv("KEYSTORE_PASS") ?: "exclavehx"
-    val alias = lp.getProperty("ALIAS_NAME") ?: System.getenv("ALIAS_NAME") ?: "exclavehx"
-    val pwd = lp.getProperty("ALIAS_PASS") ?: System.getenv("ALIAS_PASS") ?: "exclavehx"
+    val keystorePwd = lp.getProperty("KEYSTORE_PASS") ?: System.getenv("KEYSTORE_PASS") ?: "android"
+    val alias = lp.getProperty("ALIAS_NAME") ?: System.getenv("ALIAS_NAME") ?: "androiddebugkey"
+    val pwd = lp.getProperty("ALIAS_PASS") ?: System.getenv("ALIAS_PASS") ?: "android"
 
     androidApp.apply {
         if (keystoreFile.exists()) {
