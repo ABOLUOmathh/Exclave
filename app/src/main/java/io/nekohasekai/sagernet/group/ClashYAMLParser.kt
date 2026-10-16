@@ -357,6 +357,15 @@ fun parseClashProxy(proxy: Map<String, Any?>): List<AbstractBean> {
                         bean.encryption = encryption
                     }
                 }
+                proxy.getBoolean("e")?.let {
+                    bean.e = it
+                }
+                proxy.getString("h")?.takeIf { it.isNotEmpty() }?.let {
+                    bean.h = it
+                    if (bean.e == null) {
+                        bean.e = true
+                    }
+                }
             }
 
             proxy.getObject("shadowtls-opts")?.also { return listOf() }

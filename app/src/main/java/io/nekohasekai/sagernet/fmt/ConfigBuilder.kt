@@ -945,6 +945,8 @@ fun buildV2RayConfig(
                                                     fingerprint = overrideFingerprint
                                                 } else if (bean.realityFingerprint.isNotEmpty()) {
                                                     fingerprint = bean.realityFingerprint
+                                                } else {
+                                                    fingerprint = "chrome"
                                                 }
                                                 if (DataStore.realityDisableX25519Mlkem768 || bean.realityDisableX25519Mlkem768 && !forExport) {
                                                     disableX25519MLKEM768 = true
@@ -1734,6 +1736,8 @@ fun buildV2RayConfig(
                                                     fingerprint = overrideFingerprint
                                                 } else if (bean.realityFingerprint.isNotEmpty()) {
                                                     fingerprint = bean.realityFingerprint
+                                                } else {
+                                                    fingerprint = "chrome"
                                                 }
                                                 if (DataStore.realityDisableX25519Mlkem768 || bean.realityDisableX25519Mlkem768 && !forExport) {
                                                     disableX25519MLKEM768 = true

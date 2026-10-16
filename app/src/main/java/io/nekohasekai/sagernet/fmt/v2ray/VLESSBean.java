@@ -50,10 +50,10 @@ public class VLESSBean extends StandardV2RayBean {
         } else if (flow.equals("xtls-rprx-vision") && bean.flow.equals("xtls-rprx-vision-udp443")) {
             bean.flow = flow;
         }
-        if (e != null) {
+        if (bean.e == null && e != null) {
             bean.e = e;
         }
-        if (h != null && !h.isEmpty()) {
+        if ((bean.h == null || bean.h.isEmpty()) && h != null && !h.isEmpty()) {
             bean.h = h;
         }
     }

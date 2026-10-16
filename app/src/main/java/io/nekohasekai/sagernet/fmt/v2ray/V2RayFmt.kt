@@ -155,6 +155,9 @@ fun parseV2Ray(link: String): StandardV2RayBean {
                     "Invalid HeySocks VLESS h: expected hex bytes"
                 }
                 bean.h = h
+                if (bean.e == null) {
+                    bean.e = true
+                }
             }
         }
     }
@@ -187,6 +190,9 @@ fun parseV2Ray(link: String): StandardV2RayBean {
         "tls" -> {
             url.queryParameter("sni")?.let {
                 bean.sni = it
+            }
+            url.queryParameter("fp")?.let {
+                bean.utlsFingerprint = it
             }
             url.queryParameter("alpn")?.let {
                 bean.alpn = it.split(",").joinToString("\n")
@@ -259,6 +265,10 @@ fun parseV2Ray(link: String): StandardV2RayBean {
         "reality" -> {
             url.queryParameter("sni")?.let {
                 bean.sni = it
+            }
+            url.queryParameter("fp")?.let {
+                bean.realityFingerprint = it
+                bean.utlsFingerprint = it
             }
             url.queryParameter("pbk")?.let {
                 try {
@@ -1044,7 +1054,7 @@ fun StandardV2RayBean.toUri(): String? {
                 }
                 builder.addQueryParameter("pqv", realityMldsa65Verify)
             }
-            // builder.addQueryParameter("fp", "chrome") // "chrome" is only a placeholder because "若使用 REALITY，此项不可省略。".
+            builder.addQueryParameter("fp", if (realityFingerprint.isNotEmpty()) realityFingerprint else "chrome")
             if (this is VLESSBean && flow.isNotEmpty()) {
                 builder.addQueryParameter("flow", flow.removeSuffix("-udp443"))
             }

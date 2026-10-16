@@ -179,7 +179,7 @@ public abstract class StandardV2RayBean extends AbstractBean {
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(40);
+        output.writeInt(41);
         super.serialize(output);
 
         output.writeString(uuid);
@@ -317,6 +317,12 @@ public abstract class StandardV2RayBean extends AbstractBean {
         output.writeString(serverNameToVerify);
         output.writeBoolean(hy2ChromeParrot);
         output.writeString(echQueryName);
+
+        if (this instanceof VLESSBean) {
+            output.writeBoolean(((VLESSBean) this).e != null ? ((VLESSBean) this).e : false);
+            output.writeBoolean(((VLESSBean) this).e != null);
+            output.writeString(((VLESSBean) this).h != null ? ((VLESSBean) this).h : "");
+        }
     }
 
     @Override
@@ -582,6 +588,12 @@ public abstract class StandardV2RayBean extends AbstractBean {
         }
         if (version >= 39) {
             echQueryName = input.readString();
+        }
+        if (this instanceof VLESSBean && version >= 41) {
+            boolean eVal = input.readBoolean();
+            boolean eSet = input.readBoolean();
+            ((VLESSBean) this).e = eSet ? eVal : null;
+            ((VLESSBean) this).h = input.readString();
         }
     }
 
