@@ -227,7 +227,7 @@ fun Project.setupApp() {
                 (output as? VariantOutputImpl)?.let { variantOutputImpl ->
                     val versionName = variantOutputImpl.versionName.orNull.orEmpty()
                     variantOutputImpl.outputFileName.set(variantOutputImpl.outputFileName.get()
-                        .replace(project.name, "Exclave-$versionName")
+                        .replace(project.name, "ExclaveHX-$versionName")
                         .replace("-release", "")
                         .replace("-oss", "")
                     )
