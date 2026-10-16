@@ -105,17 +105,20 @@ fun Project.setupAppCommon(projectName: String = "") {
     setupCommon(projectName)
 
     val lp = requireLocalProperties()
-    val keystorePwd = lp.getProperty("KEYSTORE_PASS") ?: System.getenv("KEYSTORE_PASS")
-    val alias = lp.getProperty("ALIAS_NAME") ?: System.getenv("ALIAS_NAME")
-    val pwd = lp.getProperty("ALIAS_PASS") ?: System.getenv("ALIAS_PASS")
+    val keystoreFile = rootProject.file("release.keystore")
+    val keystorePwd = lp.getProperty("KEYSTORE_PASS") ?: System.getenv("KEYSTORE_PASS") ?: "exclavehx"
+    val alias = lp.getProperty("ALIAS_NAME") ?: System.getenv("ALIAS_NAME") ?: "exclavehx"
+    val pwd = lp.getProperty("ALIAS_PASS") ?: System.getenv("ALIAS_PASS") ?: "exclavehx"
 
     androidApp.apply {
-        if (keystorePwd != null) {
+        if (keystoreFile.exists()) {
             signingConfigs.create("release") {
-                storeFile = rootProject.file("release.keystore")
+                storeFile = keystoreFile
                 storePassword = keystorePwd
                 keyAlias = alias
                 keyPassword = pwd
+                enableV1Signing = true
+                enableV2Signing = true
                 enableV3Signing = true
             }
         }

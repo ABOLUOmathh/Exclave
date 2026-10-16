@@ -42,6 +42,9 @@ Download the latest signed release APK from [GitHub Releases](https://github.com
 
 前往 [GitHub Releases](https://github.com/ABOLUOmathh/Exclave/releases) 下载最新签名发布包。
 
+- **Permanent Signing Certificate SHA-256 / 永久签名证书指纹**:
+  `55:EB:74:04:AA:80:E9:3B:3F:43:4F:BE:52:58:8F:C1:78:35:37:FF:54:28:32:D6:5F:BF:9E:23:85:43:CD:6B`
+
 | File Pattern / 文件名称 | Architecture / 适用架构 | Target Devices / 适用设备 |
 | :--- | :--- | :--- |
 | `ExclaveHX-*-arm64-v8a-*.apk` | 64-bit ARM (Recommended / 推荐) | Modern Android phones & tablets (Android 7.0+) / 绝大多数现代安卓手机与平板 |
