@@ -95,9 +95,20 @@ object PluginManager {
             flags =
                 flags or PackageManager.MATCH_DIRECT_BOOT_UNAWARE or PackageManager.MATCH_DIRECT_BOOT_AWARE
         }
+        val currentPkg = SagerNet.application.packageName
         var providers = SagerNet.application.packageManager.queryIntentContentProviders(
-            Intent(PluginContract.ACTION_NATIVE_PLUGIN, buildUri(pluginId, "com.github.dyhkwong.sagernet")), flags)
+            Intent(PluginContract.ACTION_NATIVE_PLUGIN, buildUri(pluginId, currentPkg)), flags)
             .filter { it.providerInfo.exported }
+        if (providers.isEmpty() && currentPkg != "com.github.dyhkwonghx.sagernet") {
+            providers = SagerNet.application.packageManager.queryIntentContentProviders(
+                Intent(PluginContract.ACTION_NATIVE_PLUGIN, buildUri(pluginId, "com.github.dyhkwonghx.sagernet")), flags)
+                .filter { it.providerInfo.exported }
+        }
+        if (providers.isEmpty() && currentPkg != "com.github.dyhkwong.sagernet") {
+            providers = SagerNet.application.packageManager.queryIntentContentProviders(
+                Intent(PluginContract.ACTION_NATIVE_PLUGIN, buildUri(pluginId, "com.github.dyhkwong.sagernet")), flags)
+                .filter { it.providerInfo.exported }
+        }
         if (providers.isEmpty()) {
             try {
                 initNativeInternal(pluginId)?.also { return InitResult(it) }
