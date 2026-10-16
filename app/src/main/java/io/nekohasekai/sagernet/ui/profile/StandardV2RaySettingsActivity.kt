@@ -46,6 +46,7 @@ import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
 import io.nekohasekai.sagernet.fmt.http.HttpBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
+import io.nekohasekai.sagernet.fmt.shadowsocks.isBlackstone2022
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.trojan.TrojanBean
 import io.nekohasekai.sagernet.fmt.v2ray.StandardV2RayBean
@@ -583,8 +584,70 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         pluginConfiguration = PluginConfiguration(DataStore.serverPlugin)
         initPlugins()
 
-        findPreference<PreferenceCategory>(Key.SERVER_SING_UOT_CATEGORY)!!.isVisible =
-            (bean is ShadowsocksBean || bean is SOCKSBean) && DataStore.experimentalFlagsProperties.getBooleanProperty("singuot")
+        val singUotCategory =
+            findPreference<PreferenceCategory>(Key.SERVER_SING_UOT_CATEGORY)!!
+        val singUot = findPreference<SwitchPreference>("serverSingUot")!!
+
+        val defaultPasswordTitle = passwordUUID.title
+        val defaultPasswordDialogTitle = passwordUUID.dialogTitle
+
+        val singUotExperimentalEnabled =
+            DataStore.experimentalFlagsProperties.getBooleanProperty("singuot")
+
+        val currentBean = bean
+
+        var blackstoneMode =
+            currentBean is ShadowsocksBean && currentBean.isBlackstone2022()
+
+        fun updateBlackstoneUi(enabled: Boolean) {
+            if (bean is ShadowsocksBean) {
+                passwordUUID.title = if (enabled) {
+                    "BLACKSTONE compatibility password"
+                } else {
+                    defaultPasswordTitle
+                }
+
+                passwordUUID.dialogTitle = if (enabled) {
+                    "BLACKSTONE compatibility password"
+                } else {
+                    defaultPasswordDialogTitle
+                }
+
+                // BLACKSTONE is fixed to SS2022 AES-128 + TCP + no
+                // transport-layer security / obfuscation header.
+                encryption.isEnabled = !enabled
+                network.isEnabled = !enabled
+                header.isEnabled = !enabled
+                security.isEnabled = !enabled
+            }
+
+            singUotCategory.isVisible =
+                (bean is ShadowsocksBean || bean is SOCKSBean) &&
+                        (singUotExperimentalEnabled || enabled)
+
+            if (enabled) {
+                singUotCategory.title = "BLACKSTONE Legacy UOT v1"
+                singUot.title = "Enable Legacy UOT v1"
+            } else {
+                singUotCategory.title = "sing-uot settings"
+                singUot.title = "Enable UDP over TCP"
+            }
+        }
+
+        updateBlackstoneUi(blackstoneMode)
+
+        passwordUUID.setOnPreferenceChangeListener { _, newValue ->
+            val password = newValue as? String
+                ?: return@setOnPreferenceChangeListener false
+
+            blackstoneMode =
+                bean is ShadowsocksBean &&
+                        encryption.value == "2022-blake3-aes-128-gcm" &&
+                        password.endsWith("#BLACKSTONE")
+
+            updateBlackstoneUi(blackstoneMode)
+            true
+        }
         findPreference<PreferenceCategory>(Key.SERVER_SING_MUX_CATEGORY)!!.isVisible =
             (bean is ShadowsocksBean || bean is TrojanBean || bean is VMessBean || bean is VLESSBean) &&
                     DataStore.experimentalFlagsProperties.getBooleanProperty("singmux")
