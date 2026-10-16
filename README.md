@@ -1,138 +1,74 @@
-# Exclave
+# ExclaveHX
 
-Exclave is a proxy client.
+ExclaveHX is a high-performance, multi-protocol proxy client for Android, based on Exclave with customized protocol enhancements, independent packaging (`com.github.dyhkwonghx.sagernet`), and automatic release signing.
 
-<details>
+ExclaveHX 是基于 Exclave 深度定制的高性能多协议 Android 代理客户端。支持独立包名（`com.github.dyhkwonghx.sagernet`）以确保与官方原版共存，提供特色协议扩展与全架构自动化签名。
 
-Features:
+---
 
-- Various proxy protocols
-- Group and subscription
-- Routing
-- Proxy chain
+## 🌟 Key Features / 核心特性
 
-Some supported protocols:
+- **Enhanced VLESS Protocol Suite / 增强型 VLESS 协议体系**:
+  - Full compatibility with VLESS + REALITY + XTLS-Vision (`flow=xtls-rprx-vision`, `security=reality`).
+  - Native support for handshake authentication signature and dynamic session token updates (`e` & `h` parameter negotiation).
+  - Modern TLS handshake stabilization: automatic suppression of incompatible post-quantum cipher suites (`disableX25519MLKEM768=true`) to eliminate uTLS Chrome disconnects on REALITY endpoints.
+  - Strict URI lossless fidelity: standard 32-character unhyphenated UUID preservation and canonical query ordering across import/export.
+  - 完整支持 VLESS + REALITY + XTLS-Vision 传输。
+  - 原生支持握手认证签名校验与动态 Token 响应回写（`e` 与 `h` 参数协商更新）。
+  - TLS 握手稳定性加固：自适应规避后量子密码扩展（`disableX25519MLKEM768`），彻底消除 REALITY 握手断连。
+  - 双向无损导入导出：完整保持 32 位原生 UUID 格式与标准规范化参数排序。
 
-- Shadowsocks (with SIP003 plugin support)
-- Shadowsocks 2022 (with SIP003 plugin support)
-- Trojan
-- Hysteria 2
-- AnyTLS
-- mieru
-- NaïveProxy (as a standalone plugin)
-- TUIC
-- Juicity
-- VMess (with various optional sub-protocols)
-- VLESS (with various optional sub-protocols)
-- WireGuard (TCP and UDP only)
-- TrustTunnel (no ICMP echo support)
-- Snell v4 and Snell v6
-- ShadowQUIC
-- SSH proxy ("dynamic port forwarding")
-- HTTP CONNECT tunnel (HTTP/1.1, HTTP/1.1 with TLS, HTTP/2 and HTTP/3)
-- SOCKS4, SOCKS4A and SOCKS5
+- **Multi-Protocol Integration / 多协议全量集成**:
+  - **Shadowsocks (2022 AEAD & Legacy UOT)**: Clean TCP, UDP-over-TCP, and password/PSK validation.
+  - **XHTTP / SplitHTTP**: Adaptive multiplexing stream transport and native UDP support.
+  - **OneSocks Suite**: High-efficiency proxy protocol with native UDP and UOT v2 support.
+  - Standard Protocols: Shadowsocks, Trojan, Hysteria 2, AnyTLS, mieru, TUIC, Juicity, VMess, WireGuard, TrustTunnel, Snell, SOCKS5.
+  - **Shadowsocks (2022 AEAD 与 Legacy UOT)**：标准 TCP/UDP 传输与密码规范化校验。
+  - **XHTTP / SplitHTTP**：自适应流传输分流及原生 UDP 支持。
+  - **OneSocks 协议体系**：高效代理协议套件，支持原生 UDP 与 UOT v2。
+  - 原版全协议兼容：Shadowsocks, Trojan, Hysteria 2, AnyTLS, mieru, TUIC, Juicity, VMess, WireGuard, TrustTunnel, Snell, SOCKS5 等。
 
-</details>
+- **Independent Application ID / 独立包名共存**:
+  - Application ID: `com.github.dyhkwonghx.sagernet`
+  - Display Name: `ExclaveHX`
+  - Can be installed alongside official Exclave without data conflict or overwriting.
+  - 独立包名，可与官方原版同时安装在同一设备上，配置数据完全隔离，互不冲突。
 
-## Download
+---
 
-- Exclave
+## 📱 Download & Architecture Guide / 下载与架构指南
 
-  [Download from GitHub releases](https://github.com/ExclaveNetwork/Exclave/releases)
+Download the latest signed release APK from [GitHub Releases](https://github.com/ABOLUOmathh/Exclave/releases).
 
-  [Download from F-Droid](https://f-droid.org/packages/com.github.dyhkwong.sagernet)
+前往 [GitHub Releases](https://github.com/ABOLUOmathh/Exclave/releases) 下载最新签名发布包。
 
-  SHA-256 hash of the signing certificate: `e9fe39e1ce254c50c2f9470a757b378c0b7cc536119867f7691405b592e6994b`
+| File Pattern / 文件名称 | Architecture / 适用架构 | Target Devices / 适用设备 |
+| :--- | :--- | :--- |
+| `ExclaveHX-*-arm64-v8a-*.apk` | 64-bit ARM (Recommended / 推荐) | Modern Android phones & tablets (Android 7.0+) / 绝大多数现代安卓手机与平板 |
+| `ExclaveHX-*-armeabi-v7a-*.apk` | 32-bit ARM | Older phones, TV boxes, or IoT devices / 老旧手机、机顶盒或车载设备 |
+| `ExclaveHX-*-x86_64-*.apk` | 64-bit x86 | Mainstream PC Android emulators (MuMu, LDPlayer, BlueStacks 64-bit) / PC 安卓模拟器 |
+| `ExclaveHX-*-x86-*.apk` | 32-bit x86 | 32-bit emulators or Intel-based legacy tablets / 32 位模拟器或平板 |
+| `ExclaveHX-*-legacy-*.apk` | Universal Legacy (Android 5.0 - 6.0) | Devices running legacy Android systems / 极老旧设备（Android 5.0+） |
 
-  The default flavor (versions without `-legacy` suffix) supports Android 6.0+. The legacy flavor (versions with `-legacy` suffix, with some Gradle dependencies pinned to old versions) supports Android 5.0+. The legacy flavor is for old devices only and using it on new devices may lead to [unexpected behaviors](https://issuetracker.google.com/issues/519796838). The support for the legacy flavor is on a best-efforts basis and may be ended at any time.
+---
 
-- NaïveProxy Plugin
+## 🛠️ Build from source / 源码编译
 
-  [Download from GitHub releases](https://github.com/klzgrad/naiveproxy/releases)
-
-  It is distributed and signed by the upstream author.
-
-Starting in ~~September 2026~~ 2027, Google will [block apps from "sideloading"](https://developer.android.com/developer-verification) on [certified Android devices](https://www.android.com/certified/partners/). If you are a user who values digital freedom, we need your voice to [express opposition](https://keepandroidopen.org/). Your support will not only help save this app, but also help defend software freedom and open distribution.
-
-## Explanation of terms
-
-[Exclave wiki](https://github.com/ExclaveNetwork/Exclave/wiki). It contains some subjective comments. Viewer discretion is advised.
-
-## Translation
-
-Is Exclave not in your language, or the translation is incorrect or incomplete? Get involved in the translations on [Hosted Weblate](https://hosted.weblate.org/projects/exclave/).
-
-## Issue tracker
-
-Please report bugs and submit feature requests [here](https://github.com/ExclaveNetwork/Exclave/issues).
-
-- Before creating a new issue, please search for existing ones. Do not create duplicate issues.
-- Old versions are not supported. Please ensure that you are using the latest version.
-- For crashes, log file using "debug" log level is required. The log file may contain the secret keys used to connect to your servers. Please remove potential sensitive information before posting them publicly.
-- For memory leak and high system resource usage, pprof profile is required. Long press "About" - "Version" to enable pprof HTTP server settings and kill and restart the app to take effect.
-- Encrypt with [this GPG public key](https://github.com/dyhkwong.gpg) if the issue contains sensitive information or you are reporting a vulnerability.
-- Because of the legacy codebase, feature requests are likely not accepted.
-
-## Discussion
-
-- Public [discussions](https://github.com/ExclaveNetwork/Exclave/discussions) are always preferred because they can be viewed by everyone.
-- Private [chat group](https://t.me/s/exclavian).
-
-## Code contribution
-
-- Create a [pull request](https://github.com/ExclaveNetwork/Exclave/pulls) to contribute code. New features needs prior communications in the issue tracker, while bug fixes does not.
-
-## License
-
-    Copyright (C) 2023  dyhkwong
-    Copyright (C) 2021 by nekohasekai <contact-sagernet@sekai.icu>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-## Notice
-
-Exclave is licensed under the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. However, Exclave optionally incorporates code covered by the GNU General Public License as published by the Free Software Foundation, version 3. If `github.com/exclavenetwork/libexclavecore` is compiled with `with_clash` tag, the GNU General Public License as published by the Free Software Foundation, version 3, applies to all of Exclave.
-
-## Build from source
-
-- Install and configure JDK 21, Go 1.27 and Go Mobile.
-- Install and configure Android SDK Platform 37.0, Android SDK Build-Tools 37.0.0, Android SDK Platform-Tools and Android NDK r29 through Android Studio or Android SDK Command-line Tools.
-- Replace `release.keystore` with your own. It can be generated with Java `keytool`.
-- Create a new `local.properties` file if it does not exist. Append the following lines to `local.properties`.
-```
-    KEYSTORE_PASS=your_keystore_pass
-    ALIAS_NAME=your_alias_name
-    ALIAS_PASS=your_alias_pass
-```
-
-- Linux (x64) or macOS (x64/arm64):
-
-  - Build libexclavecore: `./run lib core` or `./library/core/build.sh`
-  - Download assets: `./gradlew :app:downloadAssets`, or update assets to the latest version: `./gradlew :app:updateAssets`
-  - Build Exclave: `./gradlew :app:assembleOssRelease` (default flavor) or `./gradlew :app:assembleLegacyRelease` (legacy flavor)
-
+- Prerequisites: JDK 21, Go 1.27+, Android SDK Platform 37.2, NDK r30.
+- Linux / macOS:
+  - Build core: `./library/core/build.sh`
+  - Download assets: `./gradlew :app:downloadAssets`
+  - Build ExclaveHX: `./gradlew :app:assembleOssRelease`
 - Windows (x64):
+  - Build core: `.\library\core\build.bat`
+  - Download assets: `.\gradlew.bat :app:downloadAssets`
+  - Build ExclaveHX: `.\gradlew.bat :app:assembleOssRelease`
+- Output artifacts are generated in `app/build/outputs/apk/oss/release/`.
 
-  - Build libexclavecore: `.\library\core\build.bat`
-  - Download assets: `.\gradlew.bat :app:downloadAssets`, or update assets to the latest version: `.\gradlew.bat :app:updateAssets`
-  - Build Exclave: `.\gradlew.bat :app:assembleOssRelease` (default flavor) or `.\gradlew.bat :app:assembleLegacyRelease` (legacy flavor)
+---
 
-- APK files are located in `.\app\build\outputs\apk\oss\release` (default flavor) or `.\app\build\outputs\apk\legacy\release` (legacy flavor).
+## 📄 License & Acknowledgments / 许可证与鸣谢
 
-## Acknowledgment
-
-- [Shadowsocks](https://github.com/shadowsocks/shadowsocks-android)
-- [SagerNet](https://github.com/SagerNet/SagerNet)
-- [husi](https://github.com/xchacha20-poly1305/husi)
-- Other forks of SagerNet
+- Licensed under [GNU General Public License v3.0](LICENSE).
+- Upstream project: [Exclave](https://github.com/ExclaveNetwork/Exclave) by dyhkwong.
+- Based on [SagerNet](https://github.com/SagerNet/SagerNet) and [Shadowsocks Android](https://github.com/shadowsocks/shadowsocks-android).

@@ -201,7 +201,7 @@ fun Project.setupApp() {
         compileOptions.isCoreLibraryDesugaringEnabled = true
         flavorDimensions.add("vendor")
         productFlavors.create("oss") {
-            minSdk = 23
+            minSdk = 24
         }
         productFlavors.create("legacy") {
             minSdk = 21

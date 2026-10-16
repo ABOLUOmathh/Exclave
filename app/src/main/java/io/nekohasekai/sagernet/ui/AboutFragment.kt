@@ -131,7 +131,7 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                             .setOnClickAction {
                                 startActivity(Intent(
                                     Intent.ACTION_VIEW,
-                                    "https://github.com/ExclaveNetwork/Exclave/releases".toUri()
+                                    "https://github.com/ABOLUOmathh/Exclave/releases".toUri()
                                 ))
                             }
                             .setOnLongClickAction {
@@ -146,7 +146,7 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                             .setOnClickAction {
                                 startActivity(Intent(
                                     Intent.ACTION_VIEW,
-                                    "https://github.com/ExclaveNetwork/exclave-core".toUri()
+                                    "https://github.com/ABOLUOmathh/exclave-core".toUri()
                                 ))
                             }
                             .build())
@@ -203,7 +203,7 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                             .setOnClickAction {
                                 startActivity(Intent(
                                     Intent.ACTION_VIEW,
-                                    "https://github.com/ExclaveNetwork/Exclave".toUri()
+                                    "https://github.com/ABOLUOmathh/Exclave".toUri()
                                 ))
                             }
                             .build())
