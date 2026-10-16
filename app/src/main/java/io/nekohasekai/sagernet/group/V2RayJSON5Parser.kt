@@ -367,6 +367,12 @@ fun parseV2Ray5Outbound(outbound: JsonObject): List<AbstractBean> {
                         settings.getString("uuid")?.also {
                             v2rayBean.uuid = parseV2RayUUID(it)
                         }
+                        settings.getBoolean("e")?.also {
+                            v2rayBean.e = it
+                        }
+                        settings.getString("h")?.takeIf { it.isNotEmpty() }?.also {
+                            v2rayBean.h = it
+                        }
                     }
                     "shadowsocks2022" -> {
                         v2rayBean as ShadowsocksBean

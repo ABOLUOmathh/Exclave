@@ -357,14 +357,14 @@ fun parseClashProxy(proxy: Map<String, Any?>): List<AbstractBean> {
                         bean.encryption = encryption
                     }
                 }
-                proxy.getBoolean("e")?.let {
+                val eVal = proxy.getBoolean("e")
+                    ?: (proxy.getInt("e")?.let { it == 1 })
+                    ?: (proxy.getString("e")?.let { it == "1" || it.equals("true", ignoreCase = true) })
+                eVal?.let {
                     bean.e = it
                 }
                 proxy.getString("h")?.takeIf { it.isNotEmpty() }?.let {
                     bean.h = it
-                    if (bean.e == null) {
-                        bean.e = true
-                    }
                 }
             }
 

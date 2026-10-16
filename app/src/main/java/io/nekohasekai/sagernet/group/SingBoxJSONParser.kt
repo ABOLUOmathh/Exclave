@@ -374,6 +374,12 @@ fun parseSingBoxOutbound(outbound: JsonObject): List<AbstractBean> {
                             else -> return listOf()
                         }
                     }
+                    outbound.getBoolean("e")?.also {
+                        v2rayBean.e = it
+                    }
+                    outbound.getString("h")?.takeIf { it.isNotEmpty() }?.also {
+                        v2rayBean.h = it
+                    }
                 }
             }
             if (v2rayBean.security == "reality") {

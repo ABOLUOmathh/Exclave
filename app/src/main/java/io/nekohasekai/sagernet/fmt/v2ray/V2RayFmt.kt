@@ -155,9 +155,6 @@ fun parseV2Ray(link: String): StandardV2RayBean {
                     "Invalid HeySocks VLESS h: expected hex bytes"
                 }
                 bean.h = h
-                if (bean.e == null) {
-                    bean.e = true
-                }
             }
         }
     }

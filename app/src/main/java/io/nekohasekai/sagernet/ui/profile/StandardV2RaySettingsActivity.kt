@@ -230,8 +230,14 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         when (this) {
             is VLESSBean -> {
                 flow = DataStore.serverFlow
-                e = DataStore.serverHeySocksVlessE
-                h = DataStore.serverHeySocksVlessH
+                val hVal = DataStore.serverHeySocksVlessH.trim()
+                h = hVal
+                e = when {
+                    DataStore.serverHeySocksVlessE -> true
+                    hVal.isNotEmpty() -> false
+                    this.e == false -> false
+                    else -> null
+                }
             }
             is VMessBean -> {
                 alterId = DataStore.serverAlterId

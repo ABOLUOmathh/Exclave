@@ -777,6 +777,12 @@ fun parseV2RayOutbound(outbound: JsonObject): List<AbstractBean> {
                                     v2rayBean.encryption = encryption
                                 }
                             }
+                            settings.getBoolean("e")?.also {
+                                v2rayBean.e = it
+                            }
+                            settings.getString("h")?.takeIf { it.isNotEmpty() }?.also {
+                                v2rayBean.h = it
+                            }
                         } ?: settings.getArray("vnext")?.get(0)?.also { vnext ->
                             vnext.getString("reverse")?.also {
                                 return listOf()
@@ -813,6 +819,12 @@ fun parseV2RayOutbound(outbound: JsonObject): List<AbstractBean> {
                                         }
                                         v2rayBean.encryption = encryption
                                     }
+                                }
+                                user.getBoolean("e")?.also {
+                                    v2rayBean.e = it
+                                }
+                                user.getString("h")?.takeIf { it.isNotEmpty() }?.also {
+                                    v2rayBean.h = it
                                 }
                             }
                         }
