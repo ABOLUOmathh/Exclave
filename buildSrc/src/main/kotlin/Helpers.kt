@@ -124,9 +124,7 @@ fun Project.setupAppCommon(projectName: String = "") {
         buildTypes.getByName("release") {
             @Suppress("UnstableApiUsage")
             vcsInfo.include = false
-            signingConfigs.findByName("release")?.let {
-                signingConfig = it
-            }
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
             ndk.debugSymbolLevel = "NONE"
         }
         buildTypes.getByName("debug") {
