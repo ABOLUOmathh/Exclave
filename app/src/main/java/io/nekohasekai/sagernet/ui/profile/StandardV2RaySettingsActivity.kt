@@ -108,7 +108,11 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         DataStore.serverALPN = alpn
         DataStore.serverCertificates = certificates
         when (this) {
-            is VLESSBean -> DataStore.serverFlow = flow
+            is VLESSBean -> {
+                DataStore.serverFlow = flow
+                DataStore.serverHeySocksVlessE = e == true
+                DataStore.serverHeySocksVlessH = h ?: ""
+            }
             is VMessBean -> {
                 DataStore.serverAlterId = alterId
                 DataStore.serverVMessExperimentalAuthenticatedLength = experimentalAuthenticatedLength
@@ -224,7 +228,11 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         pinnedPeerCertificatePublicKeySha256 = DataStore.serverPinnedCertificatePublicKey
         pinnedPeerCertificateSha256 = DataStore.serverPinnedCertificate
         when (this) {
-            is VLESSBean -> flow = DataStore.serverFlow
+            is VLESSBean -> {
+                flow = DataStore.serverFlow
+                e = DataStore.serverHeySocksVlessE
+                h = DataStore.serverHeySocksVlessH
+            }
             is VMessBean -> {
                 alterId = DataStore.serverAlterId
                 experimentalAuthenticatedLength = DataStore.serverVMessExperimentalAuthenticatedLength
@@ -322,6 +330,8 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
     lateinit var realityDisableX25519Mlkem768: SwitchPreference
 
     lateinit var packetEncoding: ListPreference
+    lateinit var heySocksVlessE: androidx.preference.SwitchPreferenceCompat
+    lateinit var heySocksVlessH: EditTextPreference
 
     lateinit var hy2UpMbps: EditTextPreference
     lateinit var hy2DownMbps: EditTextPreference
@@ -516,6 +526,10 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         findPreference<PreferenceCategory>(Key.SERVER_PLUGIN_CATEGORY)!!.isVisible = bean is ShadowsocksBean
 
         xtlsFlow.isVisible = bean is VLESSBean
+        heySocksVlessE = findPreference(Key.SERVER_HEYSOCKS_VLESS_E)!!
+        heySocksVlessH = findPreference(Key.SERVER_HEYSOCKS_VLESS_H)!!
+        heySocksVlessE.isVisible = bean is VLESSBean
+        heySocksVlessH.isVisible = bean is VLESSBean
         val fv = resources.getStringArray(R.array.xtls_flow_value)
         packetEncoding = findPreference(Key.SERVER_PACKET_ENCODING)!!
         packetEncoding.isVisible = bean is VMessBean || bean is VLESSBean

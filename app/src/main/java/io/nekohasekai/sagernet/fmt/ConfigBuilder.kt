@@ -716,6 +716,12 @@ fun buildV2RayConfig(
                                                             if (bean.flow.isNotEmpty()) {
                                                                 flow = bean.flow
                                                             }
+                                                            if (bean.e != null) {
+                                                                e = bean.e
+                                                            }
+                                                            if (!bean.h.isNullOrEmpty()) {
+                                                                h = bean.h
+                                                            }
                                                         })
                                                 })
                                             when (bean.packetEncoding) {

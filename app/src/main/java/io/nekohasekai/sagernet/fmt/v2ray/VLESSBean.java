@@ -29,10 +29,13 @@ import io.nekohasekai.sagernet.fmt.KryoConverters;
 public class VLESSBean extends StandardV2RayBean {
 
     public String flow;
+    public Boolean e;
+    public String h;
 
     @Override
     public void initializeDefaultValues() {
         if (flow == null) flow = "";
+        if (h == null) h = "";
 
         if (encryption == null) encryption = "none";
         super.initializeDefaultValues();
@@ -46,6 +49,12 @@ public class VLESSBean extends StandardV2RayBean {
             bean.flow = flow;
         } else if (flow.equals("xtls-rprx-vision") && bean.flow.equals("xtls-rprx-vision-udp443")) {
             bean.flow = flow;
+        }
+        if (e != null) {
+            bean.e = e;
+        }
+        if (h != null && !h.isEmpty()) {
+            bean.h = h;
         }
     }
 

@@ -333,6 +333,8 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var serverMtlsCertificate by profileCacheStore.string(Key.SERVER_MTLS_CERTIFICATE)
     var serverMtlsCertificatePrivateKey by profileCacheStore.string(Key.SERVER_MTLS_CERTIFICATE_PRIVATE_KEY)
     var serverFlow by profileCacheStore.string(Key.SERVER_FLOW)
+    var serverHeySocksVlessE by profileCacheStore.boolean(Key.SERVER_HEYSOCKS_VLESS_E)
+    var serverHeySocksVlessH by profileCacheStore.string(Key.SERVER_HEYSOCKS_VLESS_H)
     var serverQuicSecurity by profileCacheStore.string(Key.SERVER_QUIC_SECURITY)
     var serverWsMaxEarlyData by profileCacheStore.stringToInt(Key.SERVER_WS_MAX_EARLY_DATA)
     var serverSplithttpMode by profileCacheStore.string(Key.SERVER_SPLITHTTP_MODE)

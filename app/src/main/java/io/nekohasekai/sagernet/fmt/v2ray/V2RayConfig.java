@@ -919,6 +919,8 @@ public class V2RayConfig {
                 public String encryption;
                 public Integer level;
                 public String flow;
+                public Boolean e;
+                public String h;
 
             }
 

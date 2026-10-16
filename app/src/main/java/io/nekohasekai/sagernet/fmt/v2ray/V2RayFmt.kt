@@ -140,6 +140,23 @@ fun parseV2Ray(link: String): StandardV2RayBean {
                 bean.encryption = encryption
             }
         }
+
+        url.queryParameter("e")?.let {
+            when (it.trim().lowercase()) {
+                "1", "true" -> bean.e = true
+                "0", "false" -> bean.e = false
+                else -> error("Invalid HeySocks VLESS e value: $it")
+            }
+        }
+        url.queryParameter("h")?.let {
+            val h = it.trim()
+            if (h.isNotEmpty()) {
+                require(h.length % 2 == 0 && h.all { c -> c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F' }) {
+                    "Invalid HeySocks VLESS h: expected hex bytes"
+                }
+                bean.h = h
+            }
+        }
     }
 
     when (val security = url.queryParameter("security")) {
@@ -1042,6 +1059,15 @@ fun StandardV2RayBean.toUri(): String? {
     }
     if (this is VLESSBean && security != "none" && flow.isNotEmpty() && type != "tcp" && encryption == "none") {
         error("vision does not support $type")
+    }
+
+    if (this is VLESSBean) {
+        if (e != null) {
+            builder.addQueryParameter("e", if (e == true) "1" else "0")
+        }
+        if (!h.isNullOrEmpty()) {
+            builder.addQueryParameter("h", h)
+        }
     }
 
     return builder.string

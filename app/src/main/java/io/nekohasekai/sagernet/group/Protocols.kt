@@ -51,6 +51,18 @@ object Protocols {
                     bean.method, bean.password, bean.paddingLen,
                     bean.udp, bean.uot, bean.version
                 )
+                is io.nekohasekai.sagernet.fmt.v2ray.VLESSBean -> {
+                    if (bean.e != null || !bean.h.isNullOrEmpty()) {
+                        listOf(
+                            type, bean.serverAddress, bean.serverPort,
+                            bean.uuid, bean.flow, bean.security,
+                            bean.sni, bean.realityPublicKey, bean.realityShortId,
+                            bean.e, bean.h
+                        )
+                    } else {
+                        return bean.serverAddress + bean.serverPort + type
+                    }
+                }
                 else -> return bean.serverAddress + bean.serverPort + type
             }
 

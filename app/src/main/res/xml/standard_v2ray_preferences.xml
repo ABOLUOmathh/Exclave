@@ -66,6 +66,16 @@
             app:singleLineTitle="false"
             app:title="@string/flow"
             app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="serverHeySocksVlessE"
+            app:title="HeySocks E" />
+        <EditTextPreference
+            app:icon="@drawable/ic_notification_enhanced_encryption"
+            app:key="serverHeySocksVlessH"
+            app:title="HeySocks H"
+            app:useSimpleSummaryProvider="true" />
         <io.nekohasekai.sagernet.widget.SimpleMenuPreference
             app:entries="@array/packet_encoding_entry"
             app:entryValues="@array/packet_encoding_value"
