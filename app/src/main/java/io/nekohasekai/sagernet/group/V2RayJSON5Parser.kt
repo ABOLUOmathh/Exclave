@@ -373,6 +373,9 @@ fun parseV2Ray5Outbound(outbound: JsonObject): List<AbstractBean> {
                         settings.getString("h")?.takeIf { it.isNotEmpty() }?.also {
                             v2rayBean.h = it
                         }
+                        if (v2rayBean.e != null || !v2rayBean.h.isNullOrEmpty()) {
+                            v2rayBean.realityDisableX25519Mlkem768 = true
+                        }
                     }
                     "shadowsocks2022" -> {
                         v2rayBean as ShadowsocksBean

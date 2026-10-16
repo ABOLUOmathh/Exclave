@@ -783,6 +783,9 @@ fun parseV2RayOutbound(outbound: JsonObject): List<AbstractBean> {
                             settings.getString("h")?.takeIf { it.isNotEmpty() }?.also {
                                 v2rayBean.h = it
                             }
+                            if (v2rayBean.e != null || !v2rayBean.h.isNullOrEmpty()) {
+                                v2rayBean.realityDisableX25519Mlkem768 = true
+                            }
                         } ?: settings.getArray("vnext")?.get(0)?.also { vnext ->
                             vnext.getString("reverse")?.also {
                                 return listOf()
@@ -825,6 +828,9 @@ fun parseV2RayOutbound(outbound: JsonObject): List<AbstractBean> {
                                 }
                                 user.getString("h")?.takeIf { it.isNotEmpty() }?.also {
                                     v2rayBean.h = it
+                                }
+                                if (v2rayBean.e != null || !v2rayBean.h.isNullOrEmpty()) {
+                                    v2rayBean.realityDisableX25519Mlkem768 = true
                                 }
                             }
                         }

@@ -948,7 +948,7 @@ fun buildV2RayConfig(
                                                 } else {
                                                     fingerprint = "chrome"
                                                 }
-                                                if (DataStore.realityDisableX25519Mlkem768 || bean.realityDisableX25519Mlkem768 && !forExport) {
+                                                if ((DataStore.realityDisableX25519Mlkem768 || bean.realityDisableX25519Mlkem768 || (bean is VLESSBean && (bean.e == true || !bean.h.isNullOrEmpty()))) && !forExport) {
                                                     disableX25519MLKEM768 = true
                                                 }
                                             }

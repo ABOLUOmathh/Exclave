@@ -366,6 +366,9 @@ fun parseClashProxy(proxy: Map<String, Any?>): List<AbstractBean> {
                 proxy.getString("h")?.takeIf { it.isNotEmpty() }?.let {
                     bean.h = it
                 }
+                if (bean.e != null || !bean.h.isNullOrEmpty()) {
+                    bean.realityDisableX25519Mlkem768 = true
+                }
             }
 
             proxy.getObject("shadowtls-opts")?.also { return listOf() }

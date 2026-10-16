@@ -26,6 +26,7 @@ import io.nekohasekai.sagernet.fmt.trojan.TrojanBean
 import io.nekohasekai.sagernet.ktx.*
 import libexclavecore.Libexclavecore
 import java.io.ByteArrayOutputStream
+import java.net.URLEncoder
 import kotlin.collections.filter
 import kotlin.collections.isNotEmpty
 import kotlin.io.encoding.Base64
@@ -116,7 +117,13 @@ fun parseV2Ray(link: String): StandardV2RayBean {
             url.username
         }
     } else {
-        bean.uuid = parseRayUUID(url.username) ?: parseUUID(url.username)?.toHexDashString() ?: uuid5(url.username)
+        val rawUser = url.username
+        val parsed = parseUUID(rawUser)
+        bean.uuid = if (parsed != null) {
+            if (rawUser.contains("-")) parsed.toHexDashString() else parsed.toHexString()
+        } else {
+            parseRayUUID(rawUser) ?: uuid5(rawUser)
+        }
     }
 
     if (bean is VMessBean) {
@@ -156,6 +163,9 @@ fun parseV2Ray(link: String): StandardV2RayBean {
                 }
                 bean.h = h
             }
+        }
+        if (bean.e != null || !bean.h.isNullOrEmpty()) {
+            bean.realityDisableX25519Mlkem768 = true
         }
     }
 
@@ -290,6 +300,9 @@ fun parseV2Ray(link: String): StandardV2RayBean {
                     throw IllegalArgumentException("invalid pqv")
                 }
                 bean.realityMldsa65Verify = it
+            }
+            url.queryParameter("disableX25519MLKEM768")?.let {
+                bean.realityDisableX25519Mlkem768 = it == "1" || it.equals("true", ignoreCase = true)
             }
             if (bean is VLESSBean) {
                 url.queryParameter("flow")?.let {
@@ -747,6 +760,73 @@ private fun parseV2RayN(json: JsonObject): VMessBean {
 }
 
 fun StandardV2RayBean.toUri(): String? {
+    if (this is VLESSBean && (e != null || !h.isNullOrEmpty())) {
+        val parsed = parseUUID(uuid)
+        val rawUuid = parsed?.toHexString() ?: uuid.replace("-", "")
+        val host = if (serverAddress.contains(':') && !serverAddress.startsWith("["))
+            "[$serverAddress]" else serverAddress
+        val queryParams = mutableListOf<Pair<String, String>>()
+
+        // Canonical HeySocks VLESS parameter order:
+        // encryption=none&security=reality&type=tcp&sni=...&fp=chrome&pbk=...&sid=...&flow=xtls-rprx-vision&e=1&h=...
+        queryParams.add("encryption" to (if (encryption.isNotEmpty()) encryption else "none"))
+        queryParams.add("security" to security)
+        val transportType = when (type) {
+            "splithttp" -> "xhttp"
+            else -> type
+        }
+        queryParams.add("type" to transportType)
+        if (sni.isNotEmpty()) {
+            queryParams.add("sni" to sni)
+        }
+        val fp = if (realityFingerprint.isNotEmpty()) {
+            realityFingerprint
+        } else if (utlsFingerprint.isNotEmpty()) {
+            utlsFingerprint
+        } else {
+            "chrome"
+        }
+        queryParams.add("fp" to fp)
+        if (security == "reality") {
+            if (realityPublicKey.isNotEmpty()) {
+                queryParams.add("pbk" to realityPublicKey)
+            }
+            if (realityShortId.isNotEmpty()) {
+                queryParams.add("sid" to realityShortId)
+            }
+        }
+        if (flow.isNotEmpty()) {
+            queryParams.add("flow" to flow.removeSuffix("-udp443"))
+        }
+        if (e != null) {
+            queryParams.add("e" to if (e == true) "1" else "0")
+        }
+        if (!h.isNullOrEmpty()) {
+            queryParams.add("h" to h)
+        }
+
+        val queryString = queryParams.joinToString("&") { (k, v) ->
+            "$k=${URLEncoder.encode(v, "UTF-8").replace("+", "%20")}"
+        }
+
+        return buildString {
+            append("vless://")
+            append(rawUuid)
+            append('@')
+            append(host)
+            append(':')
+            append(serverPort)
+            if (queryString.isNotEmpty()) {
+                append('?')
+                append(queryString)
+            }
+            if (name.isNotEmpty()) {
+                append('#')
+                append(URLEncoder.encode(name, "UTF-8").replace("+", "%20"))
+            }
+        }
+    }
+
     val builder = Libexclavecore.newURL(
         when (this) {
             is VMessBean -> "vmess"
@@ -775,8 +855,9 @@ fun StandardV2RayBean.toUri(): String? {
             }
         }
         is VLESSBean -> {
-            require(Uuid.parseHexDashOrNull(uuid) != null) { "invalid uuid" }
-            builder.username = uuid
+            val parsed = parseUUID(uuid)
+            require(parsed != null) { "invalid uuid" }
+            builder.username = if (uuid.contains("-")) parsed.toHexDashString() else parsed.toHexString()
             when (encryption) {
                 "none" -> builder.addQueryParameter("encryption", "none")
                 "" -> error("unsupported vless encryption")

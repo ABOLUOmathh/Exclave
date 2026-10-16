@@ -154,7 +154,13 @@ public abstract class StandardV2RayBean extends AbstractBean {
         if (realityShortId == null) realityShortId = "";
         if (realityMldsa65Verify == null) realityMldsa65Verify = "";
         if (realityFingerprint == null) realityFingerprint = "";
-        if (realityDisableX25519Mlkem768 == null) realityDisableX25519Mlkem768 = false;
+        if (realityDisableX25519Mlkem768 == null) {
+            if (this instanceof VLESSBean && (((VLESSBean) this).e != null || (((VLESSBean) this).h != null && !((VLESSBean) this).h.isEmpty()))) {
+                realityDisableX25519Mlkem768 = true;
+            } else {
+                realityDisableX25519Mlkem768 = false;
+            }
+        }
 
         if (hy2DownMbps == null) hy2DownMbps = 0L;
         if (hy2UpMbps == null) hy2UpMbps = 0L;
