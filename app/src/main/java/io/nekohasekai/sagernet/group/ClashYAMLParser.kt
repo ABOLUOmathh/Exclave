@@ -25,9 +25,11 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.anytls.AnyTLSBean
+import io.nekohasekai.sagernet.fmt.heysocksxhttp.HeySocksXHTTPBean
 import io.nekohasekai.sagernet.fmt.http.HttpBean
 import io.nekohasekai.sagernet.fmt.hysteria2.Hysteria2Bean
 import io.nekohasekai.sagernet.fmt.mieru.MieruBean
+import io.nekohasekai.sagernet.fmt.onesocks.OneSocksBean
 import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean
 import io.nekohasekai.sagernet.fmt.shadowquic.supportedShadowQUICCongestionControl
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
@@ -1011,6 +1013,38 @@ fun parseClashProxy(proxy: Map<String, Any?>): List<AbstractBean> {
                     else -> "cubic"
                 }
                 name = proxy.getString("name")
+            })
+        }
+        "xhttp", "heysocks", "heysocks-xhttp" -> {
+            return listOf(HeySocksXHTTPBean().apply {
+                serverAddress = proxy.getString("server") ?: return listOf()
+                serverPort = proxy.getInt("port")?.takeIf { it > 0 } ?: return listOf()
+                password = proxy.getString("password") ?: ""
+                method = proxy.getString("cipher") ?: "aes-128-ctr"
+                paddingLen = proxy.getString("padding-len") ?: proxy.getString("padding") ?: proxy.getString("padding_len") ?: ""
+                udp = proxy.getBoolean("udp") ?: true
+                uot = proxy.getBoolean("udp-over-tcp") ?: proxy.getBoolean("uot") ?: proxy.getBoolean("udp_over_tcp") ?: false
+                uotVersion = proxy.getInt("udp-over-tcp-version") ?: proxy.getInt("uot-version") ?: proxy.getInt("uot_version") ?: 0
+                fakeTCP = proxy.getObject("fake-net")?.getString("tcp") ?: proxy.getString("fake-tcp") ?: proxy.getString("fake_tcp") ?: ""
+                fakeUDP = proxy.getObject("fake-net")?.getString("udp") ?: proxy.getString("fake-udp") ?: proxy.getString("fake_udp") ?: ""
+                e = proxy.getBoolean("e") ?: false
+                linkVersion = proxy.getInt("version") ?: 1
+                name = proxy.getString("name")
+                initializeDefaultValues()
+            })
+        }
+        "os", "onesocks" -> {
+            return listOf(OneSocksBean().apply {
+                serverAddress = proxy.getString("server") ?: return listOf()
+                serverPort = proxy.getInt("port")?.takeIf { it > 0 } ?: return listOf()
+                password = proxy.getString("password") ?: ""
+                method = proxy.getString("cipher") ?: "aes-128-ctr"
+                paddingLen = proxy.getString("padding-len") ?: proxy.getString("padding") ?: proxy.getString("padding_len") ?: ""
+                udp = proxy.getBoolean("udp") ?: true
+                uot = proxy.getBoolean("udp-over-tcp") ?: proxy.getBoolean("uot") ?: proxy.getBoolean("udp_over_tcp") ?: false
+                version = proxy.getInt("version") ?: 1
+                name = proxy.getString("name")
+                initializeDefaultValues()
             })
         }
         else -> return listOf()
