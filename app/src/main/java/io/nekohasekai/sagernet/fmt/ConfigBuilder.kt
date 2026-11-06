@@ -368,7 +368,7 @@ fun buildV2RayConfig(
                 inbounds.add(InboundObject().apply {
                     tag = "ipc-in"
                     protocol = "ipc"
-                    val path = SagerNet.deviceStorage.noBackupFilesDir.toString() + "/ipc.sock"
+                    val path = app.cacheDir.toString() + "/ipc.sock"
                     val udsFile = File(path)
                     if (udsFile.exists()) udsFile.delete()
                     listen = path
@@ -792,7 +792,7 @@ fun buildV2RayConfig(
                                                                         DataStore.serviceMode == Key.MODE_VPN && DataStore.tunImplementation == TunImplementation.SYSTEM
                                                                     }
                                                                     if (shouldProtect) {
-                                                                        pluginWorkingDir = SagerNet.deviceStorage.noBackupFilesDir.toString()
+                                                                        pluginWorkingDir = app.cacheDir.toString()
                                                                         if (isV2) {
                                                                             opts["__android_vpn"] = ""
                                                                         } else {
@@ -2626,7 +2626,7 @@ fun buildV2RayConfig(
         if (!forTest && !forExport) {
             inbounds.add(InboundObject().apply {
                 tag = TAG_DNS_IN
-                val path = SagerNet.deviceStorage.noBackupFilesDir.toString() + "/ipc_dns.sock"
+                val path = app.cacheDir.toString() + "/ipc_dns.sock"
                 val udsFile = File(path)
                 if (udsFile.exists()) udsFile.delete()
                 listen = path
@@ -3089,7 +3089,7 @@ fun buildCustomConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: B
         inbounds.add(InboundObject().apply {
             tag = "ipc-in"
             protocol = "ipc"
-            val path = SagerNet.deviceStorage.noBackupFilesDir.toString() + "/ipc.sock"
+            val path = app.cacheDir.toString() + "/ipc.sock"
             val udsFile = File(path)
             if (udsFile.exists()) udsFile.delete()
             listen = path
@@ -3110,7 +3110,7 @@ fun buildCustomConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: B
         })
         inbounds.add(InboundObject().apply {
             tag = TAG_DNS_IN
-            val path = SagerNet.deviceStorage.noBackupFilesDir.toString() + "/ipc_dns.sock"
+            val path = app.cacheDir.toString() + "/ipc_dns.sock"
             val udsFile = File(path)
             if (udsFile.exists()) udsFile.delete()
             listen = path
