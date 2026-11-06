@@ -68,7 +68,26 @@ val nonRawTransportName = arrayOf(
 fun parseV2Ray(link: String): StandardV2RayBean {
     // https://github.com/XTLS/Xray-core/issues/91
     // https://github.com/XTLS/Xray-core/discussions/716
-    val url = Libexclavecore.parseURL(link)
+    var effectiveLink = link
+    if (effectiveLink.startsWith("vless://", ignoreCase = true)) {
+        val rawAfter = effectiveLink.substring("vless://".length)
+        val rawAuth = rawAfter.substringBefore('#').substringBefore('?')
+        if (!rawAuth.contains('@')) {
+            val decodedAuth = runCatching { rawAuth.decodeBase64() }.getOrNull()
+            if (decodedAuth != null && decodedAuth.contains('@')) {
+                val queryAndFrag = rawAfter.substring(rawAuth.length)
+                val cleanAuth = decodedAuth.replaceFirst(Regex("^(?i)(auto|none):"), "")
+                effectiveLink = "vless://$cleanAuth$queryAndFrag"
+            } else {
+                val decodedAll = runCatching { rawAfter.decodeBase64() }.getOrNull()
+                if (decodedAll != null && decodedAll.contains('@')) {
+                    val cleanAll = decodedAll.replaceFirst(Regex("^(?i)(auto|none):"), "")
+                    effectiveLink = "vless://$cleanAll"
+                }
+            }
+        }
+    }
+    val url = Libexclavecore.parseURL(effectiveLink)
     val bean = when (url.scheme) {
         "vmess" -> VMessBean()
         "vless" -> VLESSBean()
@@ -77,7 +96,7 @@ fun parseV2Ray(link: String): StandardV2RayBean {
     }
 
     if (url.scheme == "vmess" && !url.hasPort() && url.userInfo.isEmpty()) {
-        val decoded = link.substring("vmess://".length).substringBefore("#").decodeBase64()
+        val decoded = effectiveLink.substring("vmess://".length).substringBefore("#").decodeBase64()
         try {
             return parseV2RayN(parseJson(decoded).asJsonObject)
         } catch (_: Exception) {}
@@ -107,7 +126,9 @@ fun parseV2Ray(link: String): StandardV2RayBean {
         !url.hasPort() -> error("invalid port")
         else -> url.port
     }
-    bean.name = url.fragment
+    bean.name = url.fragment.ifEmpty {
+        url.queryParameter("remarks").orEmpty()
+    }
 
     if (bean is TrojanBean) {
         // https://github.com/trojan-gfw/igniter/issues/318
@@ -117,7 +138,16 @@ fun parseV2Ray(link: String): StandardV2RayBean {
             url.username
         }
     } else {
-        val rawUser = url.username
+        val rawUser = if (bean is VLESSBean && url.hasPassword()) {
+            when {
+                parseUUID(url.password) != null || parseRayUUID(url.password) != null -> url.password
+                parseUUID(url.username) != null || parseRayUUID(url.username) != null -> url.username
+                url.username.equals("auto", ignoreCase = true) || url.username.equals("none", ignoreCase = true) -> url.password
+                else -> url.password.ifEmpty { url.username }
+            }
+        } else {
+            url.username
+        }
         val parsed = parseUUID(rawUser)
         bean.uuid = if (parsed != null) {
             if (rawUser.contains("-")) parsed.toHexDashString() else parsed.toHexString()
@@ -134,7 +164,7 @@ fun parseV2Ray(link: String): StandardV2RayBean {
     }
     if (bean is VLESSBean) {
         when (val encryption = url.queryParameter("encryption")) {
-            "none", null -> bean.encryption = "none"
+            "none", "auto", null -> bean.encryption = "none"
             "" -> error("unsupported vless encryption")
             else -> {
                 // TODO: validate VLESS encryption
@@ -195,7 +225,7 @@ fun parseV2Ray(link: String): StandardV2RayBean {
             }
         }
         "tls" -> {
-            url.queryParameter("sni")?.let {
+            (url.queryParameter("sni") ?: url.queryParameter("peer"))?.let {
                 bean.sni = it
             }
             url.queryParameter("fp")?.let {
@@ -270,7 +300,7 @@ fun parseV2Ray(link: String): StandardV2RayBean {
             }
         }
         "reality" -> {
-            url.queryParameter("sni")?.let {
+            (url.queryParameter("sni") ?: url.queryParameter("peer"))?.let {
                 bean.sni = it
             }
             url.queryParameter("fp")?.let {
@@ -319,7 +349,55 @@ fun parseV2Ray(link: String): StandardV2RayBean {
         }
     }
 
+    url.queryParameter("packetEncoding")?.let {
+        bean.packetEncoding = it
+    }
+
     bean.type = url.queryParameter("type")
+    val plugin = url.queryParameter("plugin")
+    if (bean.type.isNullOrEmpty() && !plugin.isNullOrEmpty()) {
+        val parts = plugin.split(';')
+        for (part in parts) {
+            val trimmed = part.trim()
+            if (trimmed.isEmpty()) continue
+            val eqIdx = trimmed.indexOf('=')
+            if (eqIdx != -1) {
+                val k = trimmed.substring(0, eqIdx).trim().lowercase()
+                val v = trimmed.substring(eqIdx + 1).trim()
+                when (k) {
+                    "obfs", "mode" -> {
+                        when (v.lowercase()) {
+                            "websocket", "ws" -> bean.type = "ws"
+                            "http" -> {
+                                bean.type = "tcp"
+                                bean.headerType = "http"
+                            }
+                            "quic" -> bean.type = "quic"
+                        }
+                    }
+                    "obfs-host", "host" -> {
+                        if (v.isNotEmpty()) {
+                            bean.host = v
+                        }
+                    }
+                    "obfs-uri", "path" -> {
+                        if (v.isNotEmpty()) {
+                            bean.path = v
+                        }
+                    }
+                    "tls" -> {
+                        if (v == "1" || v.equals("true", ignoreCase = true)) {
+                            bean.security = "tls"
+                        }
+                    }
+                }
+            } else {
+                when (trimmed.lowercase()) {
+                    "tls" -> bean.security = "tls"
+                }
+            }
+        }
+    }
     when (bean.type) {
         "tcp", "raw", null -> {
             bean.type = "tcp"
