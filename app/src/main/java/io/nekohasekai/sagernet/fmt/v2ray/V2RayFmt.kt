@@ -352,10 +352,14 @@ fun parseV2Ray(link: String): StandardV2RayBean {
     url.queryParameter("packetEncoding")?.let {
         bean.packetEncoding = it
     }
+    if (bean.packetEncoding.isNullOrEmpty() && (url.queryParameter("udp") == "1" || url.queryParameter("udp").equals("true", ignoreCase = true))) {
+        bean.packetEncoding = "xudp"
+    }
 
     bean.type = url.queryParameter("type")
     val plugin = url.queryParameter("plugin")
     if (bean.type.isNullOrEmpty() && !plugin.isNullOrEmpty()) {
+        var pluginSetTls = false
         val parts = plugin.split(';')
         for (part in parts) {
             val trimmed = part.trim()
@@ -388,14 +392,29 @@ fun parseV2Ray(link: String): StandardV2RayBean {
                     "tls" -> {
                         if (v == "1" || v.equals("true", ignoreCase = true)) {
                             bean.security = "tls"
+                            pluginSetTls = true
                         }
                     }
                 }
             } else {
                 when (trimmed.lowercase()) {
-                    "tls" -> bean.security = "tls"
+                    "tls" -> {
+                        bean.security = "tls"
+                        pluginSetTls = true
+                    }
                 }
             }
+        }
+        // For Trojan nodes with obfs-local/v2ray-plugin: when the plugin does NOT
+        // explicitly enable TLS, the connection uses plain transport (no TLS layer).
+        // Override the Trojan default "tls" that was set earlier, and move the
+        // "peer" value (stored as sni) to the WebSocket host header instead.
+        if (bean is TrojanBean && !pluginSetTls) {
+            bean.security = "none"
+            if (bean.host.isNullOrEmpty() && bean.sni.isNotEmpty()) {
+                bean.host = bean.sni
+            }
+            bean.sni = ""
         }
     }
     when (bean.type) {
