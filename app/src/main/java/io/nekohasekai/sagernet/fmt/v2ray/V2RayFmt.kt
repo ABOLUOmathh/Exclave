@@ -26,6 +26,7 @@ import io.nekohasekai.sagernet.fmt.trojan.TrojanBean
 import io.nekohasekai.sagernet.ktx.*
 import libexclavecore.Libexclavecore
 import java.io.ByteArrayOutputStream
+import java.net.URLDecoder
 import java.net.URLEncoder
 import kotlin.collections.filter
 import kotlin.collections.isNotEmpty
@@ -64,6 +65,20 @@ val nonRawTransportName = arrayOf(
     "grpc", "gun", "meek", "httpupgrade", "splithttp", "xhttp",
     "hysteria2", "hy2", "mekya"
 )
+
+private fun String.extractRawQueryParam(key: String): String? {
+    val query = substringBefore('#').substringAfter('?', "")
+    if (query.isEmpty()) return null
+    for (part in query.split('&')) {
+        val eq = part.indexOf('=')
+        val k = if (eq != -1) part.substring(0, eq).trim() else part.trim()
+        if (k.equals(key, ignoreCase = true)) {
+            val v = if (eq != -1) part.substring(eq + 1).trim() else ""
+            return runCatching { URLDecoder.decode(v, "UTF-8") }.getOrDefault(v)
+        }
+    }
+    return null
+}
 
 fun parseV2Ray(link: String): StandardV2RayBean {
     // https://github.com/XTLS/Xray-core/issues/91
@@ -225,7 +240,7 @@ fun parseV2Ray(link: String): StandardV2RayBean {
             }
         }
         "tls" -> {
-            (url.queryParameter("sni") ?: url.queryParameter("peer"))?.let {
+            (url.queryParameter("sni") ?: url.queryParameter("peer") ?: effectiveLink.extractRawQueryParam("sni") ?: effectiveLink.extractRawQueryParam("peer"))?.let {
                 bean.sni = it
             }
             url.queryParameter("fp")?.let {
@@ -300,7 +315,7 @@ fun parseV2Ray(link: String): StandardV2RayBean {
             }
         }
         "reality" -> {
-            (url.queryParameter("sni") ?: url.queryParameter("peer"))?.let {
+            (url.queryParameter("sni") ?: url.queryParameter("peer") ?: effectiveLink.extractRawQueryParam("sni") ?: effectiveLink.extractRawQueryParam("peer"))?.let {
                 bean.sni = it
             }
             url.queryParameter("fp")?.let {
@@ -356,10 +371,9 @@ fun parseV2Ray(link: String): StandardV2RayBean {
         bean.packetEncoding = "xudp"
     }
 
-    bean.type = url.queryParameter("type")
-    val plugin = url.queryParameter("plugin")
+    bean.type = url.queryParameter("type") ?: effectiveLink.extractRawQueryParam("type")
+    val plugin = url.queryParameter("plugin") ?: effectiveLink.extractRawQueryParam("plugin")
     if (bean.type.isNullOrEmpty() && !plugin.isNullOrEmpty()) {
-        var pluginSetTls = false
         val parts = plugin.split(';')
         for (part in parts) {
             val trimmed = part.trim()
@@ -392,7 +406,6 @@ fun parseV2Ray(link: String): StandardV2RayBean {
                     "tls" -> {
                         if (v == "1" || v.equals("true", ignoreCase = true)) {
                             bean.security = "tls"
-                            pluginSetTls = true
                         }
                     }
                 }
@@ -400,21 +413,9 @@ fun parseV2Ray(link: String): StandardV2RayBean {
                 when (trimmed.lowercase()) {
                     "tls" -> {
                         bean.security = "tls"
-                        pluginSetTls = true
                     }
                 }
             }
-        }
-        // For Trojan nodes with obfs-local/v2ray-plugin: when the plugin does NOT
-        // explicitly enable TLS, the connection uses plain transport (no TLS layer).
-        // Override the Trojan default "tls" that was set earlier, and move the
-        // "peer" value (stored as sni) to the WebSocket host header instead.
-        if (bean is TrojanBean && !pluginSetTls) {
-            bean.security = "none"
-            if (bean.host.isNullOrEmpty() && bean.sni.isNotEmpty()) {
-                bean.host = bean.sni
-            }
-            bean.sni = ""
         }
     }
     when (bean.type) {
@@ -509,7 +510,13 @@ fun parseV2Ray(link: String): StandardV2RayBean {
         "ws" -> {
             // Fuck Xray ws ALPN
             // https://github.com/XTLS/Xray-core/blob/1bdb488c9ec09ea51e6899697d5b7437f3cf6eb2/transport/internet/tls/tls.go#L94-L131
-            bean.alpn = null
+            if (bean is TrojanBean) {
+                if (bean.alpn.isNullOrEmpty()) {
+                    bean.alpn = "http/1.1"
+                }
+            } else {
+                bean.alpn = null
+            }
             url.queryParameter("host")?.let {
                 // will not follow the breaking change in
                 // https://github.com/XTLS/Xray-core/commit/a2b773135a860f63e990874c551b099dfc888471
