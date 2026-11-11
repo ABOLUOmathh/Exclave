@@ -335,6 +335,8 @@ public class V2RayConfig {
         public String network;
         public Boolean followRedirect;
         public Integer userLevel;
+        // SagerNet private
+        public Boolean interruptConnections;
 
     }
 
@@ -742,8 +744,6 @@ public class V2RayConfig {
         public String domainStrategy;
         public String redirect;
         public Integer userLevel;
-        // SagerNet private
-        public Boolean interruptConnections;
 
     }
 

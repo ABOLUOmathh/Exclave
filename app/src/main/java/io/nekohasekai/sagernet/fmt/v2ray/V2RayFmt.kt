@@ -323,12 +323,12 @@ fun parseV2Ray(link: String): StandardV2RayBean {
                 bean.utlsFingerprint = it
             }
             url.queryParameter("pbk")?.let {
-                try {
-                    require(Base64.UrlSafe.withPadding(Base64.PaddingOption.ABSENT).decode(it).size == 32)
-                } catch (_: Exception) {
-                    throw IllegalArgumentException("invalid pbk")
-                }
                 bean.realityPublicKey = it
+            }
+            try {
+                require(Base64.UrlSafe.withPadding(Base64.PaddingOption.ABSENT).decode(bean.realityPublicKey).size == 32)
+            } catch (_: Exception) {
+                throw IllegalArgumentException("invalid pbk")
             }
             url.queryParameter("sid")?.let {
                 try {
@@ -521,6 +521,11 @@ fun parseV2Ray(link: String): StandardV2RayBean {
                 // will not follow the breaking change in
                 // https://github.com/XTLS/Xray-core/commit/a2b773135a860f63e990874c551b099dfc888471
                 bean.host = it
+            }
+            if (bean is TrojanBean && bean.host.isNullOrEmpty()) {
+                if (bean.sni.isNotEmpty()) {
+                    bean.host = bean.sni
+                }
             }
             url.queryParameter("path")?.let { path ->
                 bean.path = path
