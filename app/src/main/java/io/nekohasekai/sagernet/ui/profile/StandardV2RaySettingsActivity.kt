@@ -53,7 +53,7 @@ import io.nekohasekai.sagernet.fmt.v2ray.StandardV2RayBean
 import io.nekohasekai.sagernet.fmt.v2ray.VLESSBean
 import io.nekohasekai.sagernet.fmt.v2ray.VMessBean
 import io.nekohasekai.sagernet.ktx.app
-import io.nekohasekai.sagernet.ktx.getBooleanProperty
+import io.nekohasekai.sagernet.ktx.listByLineOrComma
 import io.nekohasekai.sagernet.ktx.listenForPackageChanges
 import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
@@ -137,6 +137,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         DataStore.serverEarlyDataHeaderName = earlyDataHeaderName
         DataStore.serverSplithttpMode = splithttpMode
         DataStore.serverSplithttpExtra = splithttpExtra
+        DataStore.serverSplithttpChromeParrot = splithttpChromeParrot
         DataStore.serverUTLSFingerprint = utlsFingerprint
         DataStore.serverEchEnabled = echEnabled
         DataStore.serverEchConfigList = echConfigList
@@ -259,6 +260,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         earlyDataHeaderName = DataStore.serverEarlyDataHeaderName
         splithttpMode = DataStore.serverSplithttpMode
         splithttpExtra = DataStore.serverSplithttpExtra
+        splithttpChromeParrot = DataStore.serverSplithttpChromeParrot
         utlsFingerprint = DataStore.serverUTLSFingerprint
         mtlsCertificate = DataStore.serverMtlsCertificate
         mtlsCertificatePrivateKey = DataStore.serverMtlsCertificatePrivateKey
@@ -360,6 +362,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
     lateinit var splithttpCategory: PreferenceCategory
     lateinit var splithttpMode: ListPreference
     lateinit var splithttpExtra: EditTextPreference
+    lateinit var splithttpChromeParrot: SwitchPreference
     lateinit var grpcCategory: PreferenceCategory
     lateinit var ssExperimentsCategory: PreferenceCategory
     lateinit var httpConnectUDPCategory: PreferenceCategory
@@ -470,6 +473,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         splithttpCategory = findPreference(Key.SERVER_SH_CATEGORY)!!
         splithttpMode = findPreference(Key.SERVER_SPLITHTTP_MODE)!!
         splithttpExtra = findPreference(Key.SERVER_SPLITHTTP_EXTRA)!!
+        splithttpChromeParrot = findPreference(Key.SERVER_SPLITHTTP_CHROME_PARROT)!!
 
         grpcCategory = findPreference(Key.SERVER_GRPC_CATAGORY)!!
 
@@ -482,6 +486,12 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
                         .show()
                 }
             }
+            true
+        }
+
+        alpn.setOnPreferenceChangeListener { _, newValue ->
+            newValue as String
+            updateTle(security.value, network.value, newValue)
             true
         }
 
@@ -545,7 +555,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         }
 
         security.setOnPreferenceChangeListener { _, newValue ->
-            updateTle(newValue as String, network.value)
+            updateTle(newValue as String, network.value, alpn.text.orEmpty())
             true
         }
 
@@ -570,9 +580,13 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         }
         xtlsFlow.setOnPreferenceChangeListener { _, newValue ->
             newValue as String
-            packetEncoding.isEnabled = newValue == fv[0]
-            if (newValue != fv[0]) {
+            val visionEnabled = newValue != fv[0]
+            packetEncoding.isEnabled = !visionEnabled
+            updateMux(!visionEnabled)
+            mux.isEnabled = !visionEnabled
+            if (visionEnabled) {
                 packetEncoding.value = pev[2]
+                mux.isChecked = false
             }
             true
         }
@@ -611,10 +625,9 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         if (muxPacketEncoding.value !in pev) {
             muxPacketEncoding.value = pev[0]
         }
+        mux.isEnabled = xtlsFlow.value == fv[0]
         mux.setOnPreferenceChangeListener { _, newValue ->
-            newValue as Boolean
-            muxConcurrency.isVisible = newValue
-            muxPacketEncoding.isVisible = newValue
+            updateMux(newValue as Boolean)
             true
         }
 
@@ -632,8 +645,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         val defaultPasswordTitle = passwordUUID.title
         val defaultPasswordDialogTitle = passwordUUID.dialogTitle
 
-        val singUotExperimentalEnabled =
-            DataStore.experimentalFlagsProperties.getBooleanProperty("singuot")
+        val singUotExperimentalEnabled = DataStore.singuot
 
         val currentBean = bean
 
@@ -690,8 +702,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
             true
         }
         findPreference<PreferenceCategory>(Key.SERVER_SING_MUX_CATEGORY)!!.isVisible =
-            (bean is ShadowsocksBean || bean is TrojanBean || bean is VMessBean || bean is VLESSBean) &&
-                    DataStore.experimentalFlagsProperties.getBooleanProperty("singmux")
+            (bean is ShadowsocksBean || bean is TrojanBean || bean is VMessBean || bean is VLESSBean) && DataStore.singmux
         singMux = findPreference(Key.SERVER_SING_MUX)!!
         singMuxProtocol = findPreference(Key.SERVER_SING_MUX_PROTOCOL)!!
         singMuxMaxConnections = findPreference(Key.SERVER_SING_MUX_MAX_CONNECTIONS)!!
@@ -725,6 +736,11 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
     val kcpQuicHeadersValue = app.resources.getStringArray(R.array.kcp_quic_headers_value)
     val quicSecurityValue = app.resources.getStringArray(R.array.quic_security_value)
 
+    fun updateMux(enabled: Boolean) {
+        muxConcurrency.isVisible = enabled
+        muxPacketEncoding.isVisible = enabled
+    }
+
     fun updateView(network: String) {
         security.setEntries(R.array.transport_layer_encryption_entry)
         security.setEntryValues(R.array.transport_layer_encryption_value)
@@ -735,7 +751,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
             security.value = tlev[0]
         }
 
-        updateTle(security.value, network)
+        updateTle(security.value, network, alpn.text.orEmpty())
 
         hy2UpMbps.isVisible = network == "hysteria2"
         hy2DownMbps.isVisible = network == "hysteria2"
@@ -890,7 +906,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         }
     }
 
-    fun updateTle(security: String, network: String) {
+    fun updateTle(security: String, network: String, alpnString: String) {
         securityCategory.isVisible = security == "tls" || security == "reality"
         certificates.isVisible = security == "tls"
         pinnedCertificateChain.isVisible = security == "tls"
@@ -902,9 +918,16 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         realityPublicKey.isVisible = security == "reality"
         realityShortId.isVisible = security == "reality"
         realityMldsa65Verify.isVisible = security == "reality"
-        utlsFingerprint.isVisible = security == "tls" && (network == "tcp" || network == "ws"
-                || network == "http" || network == "meek" || network == "httpupgrade"
-                || network == "grpc" || network == "splithttp" || network == "mekya")
+        val isSplitHTTP3 = network == "splithttp" && security == "tls"
+                && alpnString.listByLineOrComma().size == 1
+                && alpnString.listByLineOrComma()[0] == "h3"
+        if (network == "splithttp") {
+            utlsFingerprint.isVisible = !isSplitHTTP3
+        } else {
+            utlsFingerprint.isVisible = security == "tls" && (network == "tcp" || network == "ws"
+                    || network == "http" || network == "meek" || network == "httpupgrade"
+                    || network == "grpc" || network == "mekya")
+        }
         mtlsCertificate.isVisible = security == "tls"
         mtlsCertificatePrivateKey.isVisible = security == "tls"
         echEnabled.isVisible = security == "tls"
@@ -913,6 +936,8 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         serverNameToVerify.isVisible = security == "tls"
         realityFingerprint.isVisible = security == "reality"
         realityDisableX25519Mlkem768.isVisible = security == "reality"
+
+        splithttpChromeParrot.isVisible = isSplitHTTP3
     }
 
     override fun onAttachedToWindow() {
@@ -996,10 +1021,10 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
                 )
                 val component = intent.resolveActivity(packageManager)
                 when {
-                    DataStore.experimentalFlagsProperties.getBooleanProperty("disableShadowsocksPluginConfigActivity") -> {
+                    DataStore.disableShadowsocksPluginConfigActivity -> {
                         showPluginEditor()
                     }
-                    plugin.selectedEntry!!.id == "v2ray-plugin" && (component == null || DataStore.experimentalFlagsProperties.getBooleanProperty("useInternalV2RayPlugin")) -> {
+                    plugin.selectedEntry!!.id == "v2ray-plugin" && (component == null || DataStore.useInternalV2RayPlugin) -> {
                         configurePlugin.launch(
                             Intent().apply {
                                 setClassName(app.packageName, "com.github.shadowsocks.plugin.v2ray.ConfigActivity")
@@ -1010,7 +1035,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
                             }
                         )
                     }
-                    plugin.selectedEntry!!.id == "obfs-local" && (component == null || DataStore.experimentalFlagsProperties.getBooleanProperty("useInternalObfsLocal")) -> {
+                    plugin.selectedEntry!!.id == "obfs-local" && (component == null || DataStore.useInternalObfsLocal) -> {
                         configurePlugin.launch(
                             Intent().apply {
                                 setClassName(app.packageName, "com.github.shadowsocks.plugin.obfs_local.ConfigActivity")

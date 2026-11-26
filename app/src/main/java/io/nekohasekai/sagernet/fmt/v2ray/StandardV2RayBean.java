@@ -52,6 +52,7 @@ public abstract class StandardV2RayBean extends AbstractBean {
     public String meekUrl;
     public String splithttpMode;
     public String splithttpExtra;
+    public Boolean splithttpChromeParrot;
 
     public String certificates;
     public String pinnedPeerCertificateChainSha256;
@@ -124,6 +125,7 @@ public abstract class StandardV2RayBean extends AbstractBean {
         if (meekUrl == null) meekUrl = "";
         if (splithttpMode == null) splithttpMode = "auto";
         if (splithttpExtra == null) splithttpExtra = "";
+        if (splithttpChromeParrot == null) splithttpChromeParrot = false;
 
         if (security == null) security = "none";
         if (sni == null) sni = "";
@@ -185,7 +187,7 @@ public abstract class StandardV2RayBean extends AbstractBean {
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(41);
+        output.writeInt(42);
         super.serialize(output);
 
         output.writeString(uuid);
@@ -329,6 +331,7 @@ public abstract class StandardV2RayBean extends AbstractBean {
             output.writeBoolean(((VLESSBean) this).e != null);
             output.writeString(((VLESSBean) this).h != null ? ((VLESSBean) this).h : "");
         }
+        output.writeBoolean(splithttpChromeParrot);
     }
 
     @Override
@@ -595,11 +598,16 @@ public abstract class StandardV2RayBean extends AbstractBean {
         if (version >= 39) {
             echQueryName = input.readString();
         }
+        // Keep reading v41 VLESS-EH fields for profiles saved by prior ExclaveHX releases,
+        // and gate splithttpChromeParrot behind v42 so existing v41 profiles do not EOF.
         if (this instanceof VLESSBean && version >= 41) {
             boolean eVal = input.readBoolean();
             boolean eSet = input.readBoolean();
             ((VLESSBean) this).e = eSet ? eVal : null;
             ((VLESSBean) this).h = input.readString();
+        }
+        if (version >= 42) {
+            splithttpChromeParrot = input.readBoolean();
         }
     }
 
@@ -666,6 +674,7 @@ public abstract class StandardV2RayBean extends AbstractBean {
         bean.singMuxMaxStreams = singMuxMaxStreams;
         bean.singMuxPadding = singMuxPadding;
         bean.hy2ChromeParrot = hy2ChromeParrot;
+        bean.splithttpChromeParrot = splithttpChromeParrot;
     }
 
     @Override

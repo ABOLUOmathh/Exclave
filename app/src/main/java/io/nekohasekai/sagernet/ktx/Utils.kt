@@ -90,7 +90,7 @@ fun Context.listenForPackageChanges(onetime: Boolean = true, callback: () -> Uni
                 addAction(Intent.ACTION_PACKAGE_ADDED)
                 addAction(Intent.ACTION_PACKAGE_REMOVED)
                 addDataScheme("package")
-            }, Context.RECEIVER_EXPORTED)
+            }, Context.RECEIVER_NOT_EXPORTED)
         } else {
             registerReceiver(this, IntentFilter().apply {
                 addAction(Intent.ACTION_PACKAGE_ADDED)
@@ -198,6 +198,10 @@ fun Fragment.needReload() {
             SagerNet.reloadService()
         }.show()
     }
+}
+
+fun Fragment.needRestart() {
+    snackbar(getString(R.string.kill_and_restart)).show()
 }
 
 fun Context.getColour(@ColorRes colorRes: Int): Int {

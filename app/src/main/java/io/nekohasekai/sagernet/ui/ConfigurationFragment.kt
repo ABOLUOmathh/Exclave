@@ -176,9 +176,11 @@ class ConfigurationFragment @JvmOverloads constructor(
             override fun onQueryTextChange(query: String?): Boolean {
                 query?.let {
                     try {
-                        val fragment = (childFragmentManager.findFragmentByTag("f" + selectedGroup.id) as GroupFragment?)
+                        val fragment = (childFragmentManager.findFragmentByTag("f" + selectedGroup.id) as? GroupFragment)
                         fragment?.adapter?.filter(query)
-                    } catch (_: Exception) {}
+                    } catch (e: Exception) {
+                        Logs.w(e)
+                    }
                 }
                 return false
             }
@@ -207,8 +209,12 @@ class ConfigurationFragment @JvmOverloads constructor(
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {
-                val fragment = (childFragmentManager.findFragmentByTag("f" + selectedGroup.id) as GroupFragment?)
-                fragment?.adapter?.filter("")
+                try {
+                    val fragment = (childFragmentManager.findFragmentByTag("f" + selectedGroup.id) as? GroupFragment)
+                    fragment?.adapter?.filter("")
+                } catch (e: Exception) {
+                    Logs.w(e)
+                }
             }
 
             override fun onTabReselected(tab: TabLayout.Tab) {}
@@ -226,7 +232,7 @@ class ConfigurationFragment @JvmOverloads constructor(
 
         toolbar.setOnClickListener {
 
-            val fragment = (childFragmentManager.findFragmentByTag("f" + selectedGroup.id) as GroupFragment?)
+            val fragment = (childFragmentManager.findFragmentByTag("f" + selectedGroup.id) as? GroupFragment)
 
             if (fragment != null) {
                 val selectedProxy = selectedItem?.id ?: DataStore.selectedProxy
@@ -261,7 +267,7 @@ class ConfigurationFragment @JvmOverloads constructor(
             DataStore.selectedGroup = selectedProxy.groupId
             groupPager.currentItem = groupIndex
 
-            val fragment = (childFragmentManager.findFragmentByTag("f" + selectedGroup.id) as GroupFragment?)
+            val fragment = (childFragmentManager.findFragmentByTag("f" + selectedGroup.id) as? GroupFragment)
             if (fragment != null) {
                 val selectedProfileIndex = fragment.adapter.configurationIdList.indexOfFirst {
                     it == selectedProxy.id
@@ -287,7 +293,7 @@ class ConfigurationFragment @JvmOverloads constructor(
     }
 
     override fun onKeyDown(ketCode: Int, event: KeyEvent): Boolean {
-        val fragment = (childFragmentManager.findFragmentByTag("f" + selectedGroup.id) as GroupFragment?)
+        val fragment = (childFragmentManager.findFragmentByTag("f" + selectedGroup.id) as? GroupFragment)
         fragment?.configurationListView?.apply {
             if (!hasFocus()) requestFocus()
         }
@@ -308,16 +314,14 @@ class ConfigurationFragment @JvmOverloads constructor(
                 val proxies = mutableListOf<AbstractBean>()
                 if (fileName != null && fileName.endsWith(".zip")) {
                     // try parse wireguard zip
-                    val zip = ZipInputStream(requireContext().contentResolver.openInputStream(file)!!)
-                    while (true) {
-                        val entry = zip.nextEntry ?: break
-                        if (entry.isDirectory) continue
-                        fileText = zip.bufferedReader().readText()
-                        RawUpdater.parseRaw(fileText)?.let { pl -> proxies.addAll(pl) }
-                        zip.closeEntry()
-                    }
-                    runCatching {
-                        zip.close()
+                    ZipInputStream(requireContext().contentResolver.openInputStream(file)!!).use { zip ->
+                        while (true) {
+                            val entry = zip.nextEntry ?: break
+                            if (entry.isDirectory) continue
+                            fileText = zip.bufferedReader().readText()
+                            RawUpdater.parseRaw(fileText)?.let { pl -> proxies.addAll(pl) }
+                            zip.closeEntry()
+                        }
                     }
                 } else {
                     fileText = requireContext().contentResolver.openInputStream(file)!!.use {
@@ -869,7 +873,7 @@ class ConfigurationFragment @JvmOverloads constructor(
 
                         try {
                             val instance = if (DataStore.tunImplementation == TunImplementation.SYSTEM && DataStore.serviceMode == Key.MODE_VPN && SagerNet.started && DataStore.startedProfile > 0) {
-                                V2RayTestInstance(profile, link, timeout, protectPath = app.cacheDir.toString() + "/protect_path")
+                                V2RayTestInstance(profile, link, timeout, protectPath = SagerNet.deviceStorage.noBackupFilesDir.toString() + "/protect_path")
                             } else {
                                 V2RayTestInstance(profile, link, timeout)
                             }
@@ -958,22 +962,21 @@ class ConfigurationFragment @JvmOverloads constructor(
                 }
 
                 try {
-                    requireActivity()
+                    val runFunc = if (now) requireActivity()::runOnUiThread else groupPager::post
+                    runFunc {
+                        groupList = newGroupList
+                        notifyDataSetChanged()
+                        if (set) groupPager.setCurrentItem(selectedGroupIndex, false)
+                        val hideTab = groupList.size < 2
+                        tabLayout.isGone = hideTab
+                        toolbar.elevation = if (hideTab) 0F else dp2px(4).toFloat()
+                        if (!select) {
+                            groupPager.registerOnPageChangeCallback(updateSelectedCallback)
+                        }
+                    }
                 } catch (e: Exception) {
                     Logs.w(e)
                     return@runOnDefaultDispatcher
-                }
-                val runFunc = if (now) requireActivity()::runOnUiThread else groupPager::post
-                runFunc {
-                    groupList = newGroupList
-                    notifyDataSetChanged()
-                    if (set) groupPager.setCurrentItem(selectedGroupIndex, false)
-                    val hideTab = groupList.size < 2
-                    tabLayout.isGone = hideTab
-                    toolbar.elevation = if (hideTab) 0F else dp2px(4).toFloat()
-                    if (!select) {
-                        groupPager.registerOnPageChangeCallback(updateSelectedCallback)
-                    }
                 }
             }
         }
@@ -1061,7 +1064,7 @@ class ConfigurationFragment @JvmOverloads constructor(
         lateinit var proxyGroup: ProxyGroup
         var selected = false
         var scrolled = false
-        val showBackup = DataStore.experimentalFlagsProperties.getBooleanProperty("enableProfileBackup")
+        val showBackup = DataStore.enableProfileBackup
 
         override fun onCreateView(
             inflater: LayoutInflater,
